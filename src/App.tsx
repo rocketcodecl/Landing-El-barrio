@@ -11,8 +11,6 @@ import { WaitlistFormSection } from './components/WaitlistFormSection';
 import { Footer } from './components/Footer';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { SiteContentProvider, useSiteContent } from './context/SiteContentContext';
-import { Edit3 } from 'lucide-react';
-
 import { RegistrationType } from './types';
 
 export default function App() {
@@ -22,11 +20,10 @@ export default function App() {
 function LandingPage() {
   const { content } = useSiteContent();
   const [selectedRole, setSelectedRole] = useState<RegistrationType>('vecino');
-  const [adminModalOpen, setAdminModalOpen] = useState(false);
-  const [adminDefaultTab, setAdminDefaultTab] = useState<'cms' | 'registros' | 'analytics' | 'integraciones'>('cms');
-  const adminPreviewEnabled = new URLSearchParams(window.location.search).get('admin') === '1';
+  const adminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
 
   useEffect(() => {
+    if (adminRoute) return;
     const storageKey = 'elbarrio_visitor_session';
     let sessionId = localStorage.getItem(storageKey);
     if (!sessionId) {
@@ -53,18 +50,13 @@ function LandingPage() {
     sendHeartbeat();
     const interval = window.setInterval(sendHeartbeat, 30000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [adminRoute]);
 
   const handleScrollToSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
-
-  const handleOpenCMS = () => {
-    setAdminDefaultTab('cms');
-    setAdminModalOpen(true);
   };
 
   const renderSection = (sectionId: string) => {
@@ -80,6 +72,14 @@ function LandingPage() {
       default: return null;
     }
   };
+
+  if (adminRoute) {
+    return (
+      <div className="min-h-screen bg-slate-950 font-sans">
+        <AdminPanelModal defaultTab="cms" onClose={() => window.location.assign('/')} />
+      </div>
+    );
+  }
 
   return (
       <div className="min-h-screen bg-[#FAFDFB] text-slate-800 flex flex-col font-sans selection:bg-[#18B68B]/20 selection:text-[#18B68B] relative">
@@ -99,31 +99,6 @@ function LandingPage() {
         {/* 10. Footer */}
         {content.layout.footerVisible && <Footer />}
 
-        {/* Floating Quick CMS Access Button for Administrator */}
-        {adminPreviewEnabled && (
-          <div className="fixed bottom-5 right-5 z-40">
-            <button
-              onClick={handleOpenCMS}
-              className="group flex items-center gap-2.5 bg-slate-900 hover:bg-[#0E8067] text-white px-4 py-3 rounded-full shadow-2xl border border-slate-700 hover:border-[#0E8067] transition-all cursor-pointer text-xs font-bold active:scale-95"
-              aria-label="Abrir el panel de administración"
-              title="Abrir panel de administración"
-            >
-              <div className="w-6 h-6 rounded-full bg-[#0E8067] group-hover:bg-white text-white group-hover:text-[#0E8067] flex items-center justify-center transition-colors">
-                <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
-              </div>
-              <span className="hidden sm:inline">Administrar landing</span>
-              <span className="sm:hidden">CMS</span>
-            </button>
-          </div>
-        )}
-
-        {/* Admin Panel Modal (CMS, Analytics & Waitlist Manager) */}
-        {adminPreviewEnabled && adminModalOpen && (
-          <AdminPanelModal
-            defaultTab={adminDefaultTab}
-            onClose={() => setAdminModalOpen(false)}
-          />
-        )}
       </div>
   );
 }

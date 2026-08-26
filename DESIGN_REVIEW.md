@@ -12,7 +12,7 @@ El trabajo corresponde exclusivamente al clon de `rocketcodecl/Landing-El-barrio
 
 - Landing React + Vite + TypeScript con tipografía Lato, siguiendo la familia principal usada por WhatRuns, y el logotipo oficial entregado.
 - Formulario de inscripción conectado a `/api/waitlist`, con validación, control de duplicados, código de referido y almacenamiento persistente.
-- Panel actual de la landing accesible mediante `?admin=1`, protegido por la cuenta administrativa existente.
+- Panel actual de la landing accesible únicamente mediante `/admin`, protegido por la cuenta administrativa existente y sin enlaces desde la página pública.
 - CMS conectado a `/api/site-content`; los cambios se guardan en el servidor. `localStorage` se conserva solo como respaldo del navegador.
 - Registros reales consultables en el panel y exportables como CSV.
 - Analytics propios: visitas, visitantes únicos, páginas, referencias y presencia en vivo, almacenados o calculados por el backend.
@@ -55,6 +55,6 @@ Se confirmó que Gemini no tenía imports, inicialización ni llamadas y fue ret
 ## Acceso y revisión
 
 - Landing pública: `https://elbarrio.lat/`
-- Panel actual de esta landing: `https://elbarrio.lat/?admin=1`
+- Panel actual de esta landing: `https://elbarrio.lat/admin`
 
 La revisión visual final debe comprobar al menos anchos de 390 px, 768 px, 1280 px y 1440 px, además de los flujos de vecino, comercio y servicio, menú móvil, filtros, FAQ, modales legales y CMS.
