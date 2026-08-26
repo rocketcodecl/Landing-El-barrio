@@ -8,6 +8,7 @@ import path from 'node:path';
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const DATA_DIR = path.resolve(process.env.ELBARRIO_DATA_DIR || process.env.DATA_DIR || './data');
+const MEDIA_DIR = path.join(DATA_DIR, 'media');
 const AUTH_SECRET = process.env.AUTH_SECRET || process.env.ADMIN_TOKEN;
 const SESSION_COOKIE = 'barrio_session';
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
   });
   next();
 });
+app.use('/api/media/files', express.static(MEDIA_DIR, { fallthrough: false, maxAge: '7d', immutable: true }));
 
 const filePath = (name) => path.join(DATA_DIR, name);
 
@@ -161,6 +163,49 @@ app.put('/api/site-content', requireAdmin, async (req, res) => {
   }
   await writeJson('site-content.json', content);
   res.json({ success: true, savedAt: new Date().toISOString() });
+});
+
+const mediaMimeTypes = new Map([
+  ['image/png', 'png'],
+  ['image/jpeg', 'jpg'],
+  ['image/webp', 'webp'],
+  ['image/gif', 'gif'],
+]);
+
+app.get('/api/media', requireAdmin, async (_req, res) => {
+  await fs.mkdir(MEDIA_DIR, { recursive: true });
+  const names = await fs.readdir(MEDIA_DIR);
+  const files = await Promise.all(names.map(async (name) => {
+    const stat = await fs.stat(path.join(MEDIA_DIR, name));
+    return { name, url: `/api/media/files/${encodeURIComponent(name)}`, size: stat.size, createdAt: stat.birthtime.toISOString() };
+  }));
+  res.json({ files: files.sort((a, b) => b.createdAt.localeCompare(a.createdAt)) });
+});
+
+app.post('/api/media', requireAdmin, async (req, res) => {
+  const mimeType = sanitizeText(req.body?.mimeType, 100).toLowerCase();
+  const extension = mediaMimeTypes.get(mimeType);
+  const encoded = String(req.body?.dataBase64 || '').replace(/^data:[^;]+;base64,/, '');
+  if (!extension || !encoded) return res.status(400).json({ error: 'Solo se permiten imágenes PNG, JPG, WEBP o GIF' });
+  const buffer = Buffer.from(encoded, 'base64');
+  if (!buffer.length || buffer.length > 5 * 1024 * 1024) return res.status(413).json({ error: 'La imagen debe pesar menos de 5 MB' });
+  const originalName = sanitizeText(req.body?.filename, 140).replace(/[^a-zA-Z0-9._-]/g, '-').replace(/\.[^.]+$/, '') || 'imagen';
+  const name = `${Date.now()}-${randomBytes(4).toString('hex')}-${originalName}.${extension}`;
+  await fs.mkdir(MEDIA_DIR, { recursive: true });
+  await fs.writeFile(path.join(MEDIA_DIR, name), buffer, { mode: 0o640 });
+  res.status(201).json({ success: true, name, url: `/api/media/files/${encodeURIComponent(name)}` });
+});
+
+app.delete('/api/media/:name', requireAdmin, async (req, res) => {
+  const name = path.basename(req.params.name);
+  if (!name || name !== req.params.name) return res.status(400).json({ error: 'Archivo inválido' });
+  try {
+    await fs.unlink(path.join(MEDIA_DIR, name));
+    res.json({ success: true });
+  } catch (error) {
+    if (error?.code === 'ENOENT') return res.status(404).json({ error: 'Archivo no encontrado' });
+    throw error;
+  }
 });
 
 app.post('/api/waitlist', async (req, res) => {

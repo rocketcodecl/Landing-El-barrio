@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { NeighborhoodPost, LocalBusiness, FAQItem } from '../types';
 import { UniversalContentEditor } from './UniversalContentEditor';
+import { AdminMediaLibrary } from './AdminMediaLibrary';
 import {
   Palette,
   Sparkles,
@@ -53,8 +54,8 @@ export function AdminCMSSection() {
   } = useSiteContent();
 
   const [activeSubTab, setActiveSubTab] = useState<
-    'layout' | 'all' | 'branding' | 'hero' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
-  >('layout');
+    'design' | 'seo' | 'media' | 'layout' | 'all' | 'branding' | 'hero' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
+  >('design');
 
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
@@ -225,6 +226,9 @@ export function AdminCMSSection() {
       {/* Sub Tabs Bar */}
       <div className="flex flex-wrap gap-2 p-1.5 bg-slate-200/80 rounded-2xl border border-slate-300">
         {[
+          { id: 'design', label: 'Diseño Global', icon: Palette },
+          { id: 'seo', label: 'SEO & Compartir', icon: ExternalLink },
+          { id: 'media', label: 'Imágenes', icon: Image },
           { id: 'layout', label: 'Estructura & Orden', icon: Settings2 },
           { id: 'all', label: 'Control Total', icon: Code2 },
           { id: 'branding', label: 'Marca & Logos', icon: Palette },
@@ -259,6 +263,45 @@ export function AdminCMSSection() {
           );
         })}
       </div>
+
+      {activeSubTab === 'design' && (
+        <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div className="border-b border-slate-100 pb-3"><h3 className="text-lg font-black text-slate-900">Diseño global y tipografía responsive</h3><p className="text-xs text-slate-500">Controla la apariencia completa. Los tamaños se expresan en píxeles y se guardan automáticamente.</p></div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <label className="text-xs font-bold text-slate-700">Familia tipográfica<input value={content.theme.fontFamily} onChange={(event) => updateSection('theme', { fontFamily: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5" /></label>
+            <label className="text-xs font-bold text-slate-700 md:col-span-2">URL de Google Fonts u otra hoja tipográfica<input type="url" value={content.theme.customFontImportUrl} onChange={(event) => updateSection('theme', { customFontImportUrl: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
+            {[
+              ['baseFontSize', 'Tamaño base', 12, 24], ['navigationFontSize', 'Navegación', 10, 24], ['bodyFontSize', 'Párrafos', 12, 28], ['buttonFontSize', 'Botones', 10, 24],
+              ['heroTitleDesktop', 'Título portada · escritorio', 30, 100], ['heroTitleMobile', 'Título portada · móvil', 24, 72], ['sectionTitleDesktop', 'Títulos de sección · escritorio', 24, 72], ['sectionTitleMobile', 'Títulos de sección · móvil', 20, 56],
+              ['contentMaxWidth', 'Ancho máximo del contenido', 900, 1800], ['sectionSpacingDesktop', 'Espaciado de secciones · escritorio', 20, 180], ['sectionSpacingMobile', 'Espaciado de secciones · móvil', 20, 140], ['cardRadius', 'Redondeo de tarjetas', 0, 48], ['buttonRadius', 'Redondeo de botones', 0, 40], ['borderWidth', 'Grosor de bordes', 0, 6],
+            ].map(([key, label, min, max]) => {
+              const value = content.theme[key as keyof typeof content.theme] as number;
+              return <label key={String(key)} className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-bold text-slate-700"><span className="flex justify-between"><span>{label}</span><strong>{value}px</strong></span><input type="range" min={Number(min)} max={Number(max)} value={value} onChange={(event) => updateSection('theme', { [key]: Number(event.target.value) })} className="mt-3 w-full accent-[#18B68B]" /></label>;
+            })}
+            <label className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs font-bold text-slate-700"><span className="flex justify-between"><span>Intensidad de sombras</span><strong>{content.theme.shadowOpacity.toFixed(2)}</strong></span><input type="range" min="0" max="0.5" step="0.01" value={content.theme.shadowOpacity} onChange={(event) => updateSection('theme', { shadowOpacity: Number(event.target.value) })} className="mt-3 w-full accent-[#18B68B]" /></label>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['primaryColor', 'Color principal'], ['primaryDarkColor', 'Color principal oscuro'], ['pageBackground', 'Fondo de página'], ['surfaceColor', 'Fondo de tarjetas'], ['textColor', 'Texto principal'], ['mutedTextColor', 'Texto secundario'],
+            ].map(([key, label]) => <label key={key} className="text-xs font-bold text-slate-700"><span>{label}</span><div className="mt-1 flex gap-2"><input type="color" value={String(content.theme[key as keyof typeof content.theme])} onChange={(event) => updateSection('theme', { [key]: event.target.value })} className="h-10 w-12 rounded border" /><input value={String(content.theme[key as keyof typeof content.theme])} onChange={(event) => updateSection('theme', { [key]: event.target.value })} className="min-w-0 flex-1 rounded-xl border border-slate-300 px-3 py-2 font-mono" /></div></label>)}
+          </div>
+          <label className="block text-xs font-bold text-slate-700">CSS personalizado<textarea rows={10} spellCheck={false} value={content.theme.customCss} onChange={(event) => updateSection('theme', { customCss: event.target.value })} placeholder="/* Tus reglas CSS adicionales */" className="mt-1 w-full rounded-xl border border-slate-300 bg-slate-950 p-4 font-mono text-xs text-emerald-200" /></label>
+        </div>
+      )}
+
+      {activeSubTab === 'seo' && (
+        <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div className="border-b border-slate-100 pb-3"><h3 className="text-lg font-black text-slate-900">SEO, buscadores y enlaces compartidos</h3><p className="text-xs text-slate-500">Edita el título del navegador, descripción, indexación, imagen social, URL canónica y favicon.</p></div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ['siteTitle', 'Título del sitio'], ['keywords', 'Palabras clave'], ['canonicalUrl', 'URL canónica'], ['socialImageUrl', 'Imagen para redes sociales'], ['faviconUrl', 'Favicon'], ['robots', 'Directiva robots'],
+            ].map(([key, label]) => <label key={key} className="text-xs font-bold text-slate-700">{label}<input value={content.seo[key as keyof typeof content.seo]} onChange={(event) => updateSection('seo', { [key]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>)}
+            <label className="text-xs font-bold text-slate-700 md:col-span-2">Descripción<textarea rows={4} value={content.seo.description} onChange={(event) => updateSection('seo', { description: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
+          </div>
+        </div>
+      )}
+
+      {activeSubTab === 'media' && <AdminMediaLibrary />}
 
       {activeSubTab === 'layout' && (
         <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
@@ -356,18 +399,20 @@ export function AdminCMSSection() {
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
-                    value={content.branding.primaryColor || '#18B68B'}
+                    value={content.theme.primaryColor || '#18B68B'}
                     onChange={(e) => {
                       updateSection('branding', { primaryColor: e.target.value });
+                      updateSection('theme', { primaryColor: e.target.value });
                       notifySaved();
                     }}
                     className="w-10 h-10 rounded-xl border border-slate-300 p-0.5 cursor-pointer"
                   />
                   <input
                     type="text"
-                    value={content.branding.primaryColor || '#18B68B'}
+                    value={content.theme.primaryColor || '#18B68B'}
                     onChange={(e) => {
                       updateSection('branding', { primaryColor: e.target.value });
+                      updateSection('theme', { primaryColor: e.target.value });
                       notifySaved();
                     }}
                     className="flex-1 text-xs font-mono font-bold p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]"

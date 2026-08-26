@@ -18,6 +18,9 @@ El trabajo corresponde exclusivamente al clon de `rocketcodecl/Landing-El-barrio
 - Analytics propios: visitas, visitantes únicos, páginas, referencias y presencia en vivo, almacenados o calculados por el backend.
 - Dashboard de métricas con actividad en vivo, fuentes, páginas vistas, series de siete días, lista de espera por perfil y comuna, y registros recientes.
 - Editor total con controles para todos los campos persistentes, orden y visibilidad de secciones, además de edición JSON avanzada.
+- Diseño global editable: familia y carga de fuente, escalas tipográficas para móvil/escritorio, colores, anchos, espaciados, radios, bordes, sombras y CSS personalizado.
+- SEO editable en runtime: título, descripción, palabras clave, canonical, robots, favicon e imagen social.
+- Biblioteca privada para subir, reutilizar y eliminar imágenes propias desde el administrador.
 - API Express ejecutada como servicio de sistema y expuesta únicamente mediante el proxy HTTPS de `/api/`.
 - Copia automática horaria de los datos persistentes, con retención de 30 días.
 

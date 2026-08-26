@@ -10,6 +10,7 @@ import { FAQSection } from './components/FAQSection';
 import { WaitlistFormSection } from './components/WaitlistFormSection';
 import { Footer } from './components/Footer';
 import { AdminPanelModal } from './components/AdminPanelModal';
+import { SiteRuntimeSettings } from './components/SiteRuntimeSettings';
 import { SiteContentProvider, useSiteContent } from './context/SiteContentContext';
 import { RegistrationType } from './types';
 
@@ -76,6 +77,7 @@ function LandingPage() {
   if (adminRoute) {
     return (
       <div className="min-h-screen bg-slate-950 font-sans">
+        <SiteRuntimeSettings includeCustomCss={false} />
         <AdminPanelModal defaultTab="cms" onClose={() => window.location.assign('/')} />
       </div>
     );
@@ -83,6 +85,7 @@ function LandingPage() {
 
   return (
       <div className="min-h-screen bg-[#FAFDFB] text-slate-800 flex flex-col font-sans selection:bg-[#18B68B]/20 selection:text-[#18B68B] relative">
+        <SiteRuntimeSettings />
         
         {/* 1. Header */}
         {content.layout.headerVisible && <Header

@@ -64,3 +64,101 @@ button, input, select, textarea {
   backdrop-filter: blur(12px);
   border: 1px solid rgba(24, 182, 139, 0.12);
 }
+
+/* Variables administradas desde el CMS */
+html,
+body {
+  font-family: var(--cms-font-family, 'Lato', sans-serif);
+  font-size: var(--cms-base-size, 16px);
+  background: var(--cms-page-bg, #FAFDFB);
+  color: var(--cms-text, #0F172A);
+}
+
+body p {
+  font-size: var(--cms-body-size, 16px);
+}
+
+nav {
+  font-size: var(--cms-nav-size, 14px);
+}
+
+main h1 {
+  font-size: var(--cms-hero-mobile, 40px) !important;
+}
+
+main h2 {
+  font-size: var(--cms-title-mobile, 32px) !important;
+}
+
+main > section {
+  padding-top: var(--cms-section-mobile, 64px) !important;
+  padding-bottom: var(--cms-section-mobile, 64px) !important;
+}
+
+.max-w-7xl {
+  max-width: var(--cms-content-width, 1280px) !important;
+}
+
+button,
+[class*="rounded-xl"][role="button"] {
+  font-size: var(--cms-button-size, 16px);
+  border-radius: var(--cms-button-radius, 12px);
+}
+
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: var(--cms-card-radius, 24px) !important;
+}
+
+[class*="text-[#18B68B]"],
+[class*="text-[#0E8067]"] {
+  color: var(--cms-primary) !important;
+}
+
+[class*="bg-[#18B68B]"],
+[class*="bg-[#0E8067]"] {
+  background-color: var(--cms-primary) !important;
+}
+
+[class*="border-[#18B68B]"],
+[class*="border-[#0E8067]"] {
+  border-color: var(--cms-primary) !important;
+}
+
+main [class*="bg-white"] {
+  background-color: var(--cms-surface, #FFFFFF) !important;
+}
+
+main [class*="text-slate-900"],
+main [class*="text-slate-950"] {
+  color: var(--cms-text, #0F172A) !important;
+}
+
+main [class*="text-slate-500"],
+main [class*="text-slate-600"],
+main [class*="text-slate-700"] {
+  color: var(--cms-muted, #475569) !important;
+}
+
+main [class*="border"][class*="rounded"] {
+  border-width: var(--cms-border-width, 1px);
+}
+
+main [class*="shadow"] {
+  --tw-shadow-color: rgb(15 23 42 / var(--cms-shadow-opacity, 0.18));
+}
+
+@media (min-width: 768px) {
+  main h1 {
+    font-size: var(--cms-hero-desktop, 60px) !important;
+  }
+
+  main h2 {
+    font-size: var(--cms-title-desktop, 40px) !important;
+  }
+
+  main > section {
+    padding-top: var(--cms-section-desktop, 80px) !important;
+    padding-bottom: var(--cms-section-desktop, 80px) !important;
+  }
+}

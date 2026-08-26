@@ -310,7 +310,46 @@ export interface LegalConfig {
   community: LegalDocumentConfig;
 }
 
+export interface ThemeConfig {
+  fontFamily: string;
+  customFontImportUrl: string;
+  baseFontSize: number;
+  navigationFontSize: number;
+  heroTitleDesktop: number;
+  heroTitleMobile: number;
+  sectionTitleDesktop: number;
+  sectionTitleMobile: number;
+  bodyFontSize: number;
+  buttonFontSize: number;
+  contentMaxWidth: number;
+  sectionSpacingDesktop: number;
+  sectionSpacingMobile: number;
+  cardRadius: number;
+  buttonRadius: number;
+  borderWidth: number;
+  shadowOpacity: number;
+  primaryColor: string;
+  primaryDarkColor: string;
+  pageBackground: string;
+  surfaceColor: string;
+  textColor: string;
+  mutedTextColor: string;
+  customCss: string;
+}
+
+export interface SEOConfig {
+  siteTitle: string;
+  description: string;
+  keywords: string;
+  canonicalUrl: string;
+  socialImageUrl: string;
+  faviconUrl: string;
+  robots: string;
+}
+
 export interface SiteContent {
+  theme: ThemeConfig;
+  seo: SEOConfig;
   layout: LayoutConfig;
   navigation: NavigationConfig;
   branding: BrandingConfig;
