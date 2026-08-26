@@ -61,7 +61,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#18B68B] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Escena de Actividad en Vivo</span>
+            <span>Vista referencial de la experiencia</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -69,11 +69,11 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
           </h2>
 
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Sin algoritmos de redes sociales ni publicaciones irrelevantes. Mira cómo interactúan vecinos verificados a menos de 500 metros de distancia.
+            Ejemplos de cómo vecinos, comercios y servicios podrían encontrarse dentro de un mismo cuadrante.
           </p>
 
           {/* Filter Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-4" role="group" aria-label="Filtrar ejemplos de publicaciones">
             {[
               { id: 'todos', label: 'Todos los avisos' },
               { id: 'mercado', label: '🛒 Mercado & Arriendos' },
@@ -85,6 +85,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id)}
+                aria-pressed={activeFilter === tab.id}
                 className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                   activeFilter === tab.id
                     ? 'bg-[#18B68B] text-white shadow-md shadow-[#18B68B]/20'

@@ -61,7 +61,7 @@ export function LegalModal({ type, onClose }: LegalModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[85vh] flex flex-col">
+      <div role="dialog" aria-modal="true" aria-labelledby="legal-modal-title" className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[85vh] flex flex-col">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
@@ -69,10 +69,11 @@ export function LegalModal({ type, onClose }: LegalModalProps) {
             <div className="p-2 rounded-xl bg-emerald-50">
               {content.icon}
             </div>
-            <h3 className="font-extrabold text-slate-900 text-xl">{content.title}</h3>
+            <h3 id="legal-modal-title" className="font-extrabold text-slate-900 text-xl">{content.title}</h3>
           </div>
           <button 
             onClick={onClose}
+            aria-label="Cerrar información legal"
             className="p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
           >
             <X className="w-5 h-5" />

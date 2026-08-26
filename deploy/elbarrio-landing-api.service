@@ -1,0 +1,21 @@
+[Unit]
+Description=El Barrio landing API
+After=network.target
+
+[Service]
+Type=simple
+User=elbarrio.lat_tmd37tnf9y
+Group=psaserv
+WorkingDirectory=/var/www/vhosts/elbarrio.lat/landing-backend
+EnvironmentFile=/var/www/vhosts/elbarrio.lat/landing-backend/.env
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=ELBARRIO_DATA_DIR=/var/www/vhosts/elbarrio.lat/private/landing-data
+ExecStart=/usr/bin/node server/index.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

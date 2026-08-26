@@ -112,19 +112,22 @@ export function BrandLogo({
 
   const sizeMap = {
     sm: 'h-8',
-    md: 'h-10',
-    lg: 'h-14',
-    xl: 'h-20',
+    md: 'h-12',
+    lg: 'h-16',
+    xl: 'h-24',
   };
 
-  const customLogo = contentBranding?.customLogoUrl;
+  const customLogo = contentBranding?.customLogoUrl || '/logo-el-barrio.png';
   if (customLogo) {
     return (
       <img
         src={customLogo}
         alt={contentBranding?.appName || 'Logotipo'}
+        width="403"
+        height="152"
         className={`${sizeMap[size]} w-auto object-contain shrink-0 ${className}`}
         referrerPolicy="no-referrer"
+        draggable={false}
       />
     );
   }

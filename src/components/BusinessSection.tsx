@@ -78,7 +78,7 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         {/* Dynamic Local Business Cards */}
         <div className="mb-12">
           <h3 className="text-xl font-bold text-slate-900 text-center mb-6">
-            Comercios y servicios ya registrados en activación
+            Ejemplos de perfiles para comercios y servicios locales
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

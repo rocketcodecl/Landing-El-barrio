@@ -3,12 +3,11 @@ import { Menu, X, ShieldCheck, ArrowRight, Store, Users } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 
 interface HeaderProps {
-  onOpenAdmin: () => void;
   onScrollToSection: (sectionId: string) => void;
   onSelectRoleForm?: (role: 'vecino' | 'comercio' | 'servicio') => void;
 }
 
-export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: HeaderProps) {
+export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (id: string) => {
@@ -42,7 +41,7 @@ export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: Hea
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+          <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
             <button 
               onClick={() => handleNavClick('asi-se-vive')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
@@ -79,14 +78,6 @@ export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: Hea
           {/* Action CTAs */}
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={onOpenAdmin}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all cursor-pointer"
-              title="Acceso previo al Panel Administrativo"
-            >
-              Panel Admin
-            </button>
-
-            <button
               onClick={() => handleRoleClick('vecino')}
               className="bg-[#18B68B] hover:bg-[#15a27c] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md shadow-[#18B68B]/25 hover:shadow-lg hover:shadow-[#18B68B]/35 transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98]"
             >
@@ -100,7 +91,9 @@ export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: Hea
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2.5 rounded-xl text-slate-700 hover:bg-emerald-50 focus:outline-none"
-              aria-label="Toggle Navigation Menu"
+              aria-label={mobileMenuOpen ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -110,7 +103,7 @@ export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: Hea
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-emerald-900/10 px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in slide-in-from-top duration-200">
+        <div id="mobile-navigation" className="md:hidden bg-white border-b border-emerald-900/10 px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-2">
             <button
               onClick={() => handleNavClick('asi-se-vive')}
@@ -160,13 +153,6 @@ export function Header({ onOpenAdmin, onScrollToSection, onSelectRoleForm }: Hea
             >
               <Store className="w-4 h-4 text-[#18B68B]" />
               <span>Sumar mi Comercio</span>
-            </button>
-
-            <button
-              onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-              className="w-full text-center text-xs text-slate-500 py-2 hover:underline"
-            >
-              Acceso a Panel Administrativo (Demo)
             </button>
           </div>
         </div>

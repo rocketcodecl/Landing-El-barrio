@@ -32,7 +32,7 @@ export function TrustSection() {
       {
         id: 'p-5',
         title: 'Moderación & Reportes',
-        description: 'Herramientas de reporte en 1 clic y revisión activa 24/7. Retiro inmediato de contenido inapropiado o conducta abusiva.'
+        description: 'Herramientas de reporte y revisión de contenido para abordar publicaciones inapropiadas o conductas abusivas.'
       },
       {
         id: 'p-6',

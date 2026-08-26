@@ -1,20 +1,118 @@
-import { useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { SiteAnalytics, WaitlistEntry } from '../types';
-import { X, Users, Eye, Download, Search, CheckCircle, BarChart3, Globe, Filter, Sparkles, SlidersHorizontal, Edit3 } from 'lucide-react';
+import { X, Users, Eye, Download, Search, CheckCircle, BarChart3, Globe, Filter, Sparkles, SlidersHorizontal, Edit3, LogOut } from 'lucide-react';
 import { AdminCMSSection } from './AdminCMSSection';
 
 interface AdminPanelModalProps {
-  analytics: SiteAnalytics;
-  waitlistEntries: WaitlistEntry[];
   onClose: () => void;
-  onExportCSV: () => void;
   defaultTab?: 'cms' | 'registros' | 'analytics' | 'integraciones';
 }
 
-export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportCSV, defaultTab = 'cms' }: AdminPanelModalProps) {
+const EMPTY_ANALYTICS: SiteAnalytics = {
+  activeVisitors: 0,
+  dailyVisits: 0,
+  totalVisits: 0,
+  uniqueVisitors: 0,
+  topPages: [],
+  visitorSources: [],
+};
+
+export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModalProps) {
   const [activeTab, setActiveTab] = useState<'cms' | 'registros' | 'analytics' | 'integraciones'>(defaultTab);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('todos');
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginPending, setLoginPending] = useState(false);
+  const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([]);
+  const [analytics, setAnalytics] = useState<SiteAnalytics>(EMPTY_ANALYTICS);
+
+  const loadAdminData = useCallback(async () => {
+    const [waitlistResponse, analyticsResponse] = await Promise.all([
+      fetch('/api/waitlist', { credentials: 'same-origin' }),
+      fetch('/api/analytics', { credentials: 'same-origin' }),
+    ]);
+    if (waitlistResponse.status === 401 || analyticsResponse.status === 401) {
+      setAuthenticated(false);
+      return;
+    }
+    if (waitlistResponse.ok) {
+      const data = await waitlistResponse.json();
+      setWaitlistEntries((data.entries || []).map((entry: any) => ({
+        id: entry.id,
+        nombre: entry.nombre,
+        correo: entry.correo,
+        whatsapp: entry.whatsapp || '',
+        comuna: entry.comuna || '',
+        tipo_registro: entry.participantType,
+        nombreNegocio: entry.nombreNegocio || undefined,
+        rubro: entry.rubro || undefined,
+        fecha: String(entry.createdAt || '').replace('T', ' ').slice(0, 16),
+      })));
+    }
+    if (analyticsResponse.ok) {
+      const data = await analyticsResponse.json();
+      const totalSources = (data.visitorSources || []).reduce((sum: number, item: any) => sum + Number(item.visits || 0), 0);
+      setAnalytics({
+        activeVisitors: data.activeVisitors || 0,
+        dailyVisits: data.dailyVisits || 0,
+        totalVisits: data.totalVisits || 0,
+        uniqueVisitors: data.uniqueVisitors || 0,
+        topPages: data.topPages || [],
+        visitorSources: (data.visitorSources || []).map((item: any) => ({
+          source: item.source,
+          percentage: totalSources ? Math.round((item.visits / totalSources) * 100) : 0,
+        })),
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/auth/status', { credentials: 'same-origin' })
+      .then((response) => response.json())
+      .then((data) => setAuthenticated(Boolean(data.authenticated)))
+      .catch(() => setAuthenticated(false));
+  }, []);
+
+  useEffect(() => {
+    if (!authenticated) return;
+    loadAdminData();
+    const interval = window.setInterval(loadAdminData, 30000);
+    return () => window.clearInterval(interval);
+  }, [authenticated, loadAdminData]);
+
+  const handleLogin = async (event: FormEvent) => {
+    event.preventDefault();
+    setLoginPending(true);
+    setLoginError(null);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'No fue posible iniciar sesión');
+      setPassword('');
+      setAuthenticated(true);
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : 'No fue posible iniciar sesión');
+    } finally {
+      setLoginPending(false);
+    }
+  };
+
+  const handleExportCSV = () => {
+    window.location.assign('/api/waitlist.csv');
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    setAuthenticated(false);
+  };
 
   const filteredEntries = waitlistEntries.filter(entry => {
     const matchesSearch = 
@@ -27,9 +125,46 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
     return matchesSearch && matchesType;
   });
 
+  if (authenticated !== true) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
+        <div role="dialog" aria-modal="true" aria-labelledby="admin-login-title" className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-2xl sm:p-9">
+          <div className="mb-7 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-wider text-[#0E8067]">Acceso protegido</p>
+              <h2 id="admin-login-title" className="mt-2 text-2xl font-extrabold text-slate-950">Administración El Barrio</h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-500">Ingresa con la cuenta administrativa existente.</p>
+            </div>
+            <button onClick={onClose} aria-label="Cerrar acceso administrativo" className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          {authenticated === null ? (
+            <p className="py-8 text-center text-sm font-semibold text-slate-500">Comprobando sesión…</p>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label htmlFor="admin-username" className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-600">Usuario</label>
+                <input id="admin-username" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-transparent focus:ring-2 focus:ring-[#0E8067]" required />
+              </div>
+              <div>
+                <label htmlFor="admin-password" className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-600">Contraseña</label>
+                <input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-transparent focus:ring-2 focus:ring-[#0E8067]" required />
+              </div>
+              {loginError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{loginError}</p>}
+              <button disabled={loginPending} className="w-full rounded-xl bg-slate-900 px-5 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-[#0E8067] disabled:opacity-60">
+                {loginPending ? 'Ingresando…' : 'Ingresar al panel'}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-6xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+      <div role="dialog" aria-modal="true" aria-labelledby="admin-panel-title" className="bg-white rounded-3xl max-w-6xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
         
         {/* Header Bar */}
         <div className="bg-slate-900 text-white p-4 sm:p-6 flex items-center justify-between border-b border-slate-800 shrink-0">
@@ -39,17 +174,18 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-lg text-white">Panel Administrativo El Barrio</h3>
+                <h3 id="admin-panel-title" className="font-extrabold text-lg text-white">Panel Administrativo El Barrio</h3>
                 <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-500/30">
-                  Control Total CMS & Data
+                  Datos persistentes
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Edición en vivo de textos, logos, imágenes, feed vecinal y lista de espera</p>
+              <p className="text-xs text-slate-400">Contenido, registros y métricas conectados al servidor</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
+            aria-label="Cerrar panel administrativo"
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-6 h-6" />
@@ -91,7 +227,7 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>Métricas de Tráfico</span>
+            <span>Métricas del sitio</span>
           </button>
 
           <button
@@ -144,7 +280,7 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
                 </div>
 
                 <button
-                  onClick={onExportCSV}
+                  onClick={handleExportCSV}
                   className="bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
                   <Download className="w-4 h-4" />
@@ -280,8 +416,8 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
                     <h4 className="font-bold text-slate-900 text-sm">Google Analytics 4 (GA4)</h4>
                     <p className="text-xs text-slate-500">Medición de eventos de conversión y tráfico</p>
                   </div>
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5" /> Conectado
+                  <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> Pendiente
                   </span>
                 </div>
               </div>
@@ -292,8 +428,8 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
                     <h4 className="font-bold text-slate-900 text-sm">Meta / Facebook Pixel</h4>
                     <p className="text-xs text-slate-500">Seguimiento de campañas en Instagram y Facebook</p>
                   </div>
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5" /> Conectado
+                  <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> Pendiente
                   </span>
                 </div>
               </div>
@@ -304,8 +440,8 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
                     <h4 className="font-bold text-slate-900 text-sm">TikTok Pixel & Hotjar</h4>
                     <p className="text-xs text-slate-500">Mapas de calor de interacción y métricas sociales</p>
                   </div>
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5" /> Conectado
+                  <span className="text-xs bg-amber-100 text-amber-900 font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> Pendiente
                   </span>
                 </div>
               </div>
@@ -316,13 +452,10 @@ export function AdminPanelModal({ analytics, waitlistEntries, onClose, onExportC
 
         {/* Footer Bar */}
         <div className="bg-white border-t border-slate-200 p-4 px-6 flex items-center justify-between text-xs text-slate-500 shrink-0">
-          <span className="font-semibold text-slate-600">El Barrio CMS & Administration Suite</span>
-          <button
-            onClick={onClose}
-            className="bg-slate-900 text-white font-bold px-5 py-2 rounded-xl hover:bg-slate-800 cursor-pointer"
-          >
-            Cerrar Panel
+          <button onClick={handleLogout} className="flex items-center gap-2 font-bold text-slate-500 hover:text-red-700">
+            <LogOut className="h-4 w-4" /> Cerrar sesión
           </button>
+          <button onClick={onClose} className="bg-slate-900 text-white font-bold px-5 py-2 rounded-xl hover:bg-slate-800 cursor-pointer">Cerrar Panel</button>
         </div>
 
       </div>

@@ -2,5 +2,5 @@
   "name": "El Barrio",
   "description": "El Barrio - Tu barrio, en un solo lugar. Conecta con tus vecinos, compra, vende, regala, arrienda, encuentra servicios y entérate de lo que pasa cerca de ti.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

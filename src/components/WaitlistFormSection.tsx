@@ -1,16 +1,15 @@
 import { useState, FormEvent } from 'react';
 import { CHILEAN_COMMUNES } from '../data/mockData';
-import { RegistrationType, WaitlistEntry } from '../types';
-import { Users, Store, Wrench, ArrowRight, CheckCircle2, Sparkles, Share2, Copy, Check, MapPin, ShieldCheck, Flame } from 'lucide-react';
+import { RegistrationType } from '../types';
+import { Users, Store, Wrench, ArrowRight, CheckCircle2, Sparkles, Share2, Copy, Check, MapPin, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 
 interface WaitlistFormProps {
   selectedRole: RegistrationType;
   onRoleChange: (role: RegistrationType) => void;
-  onAddRegistration: (entry: WaitlistEntry) => void;
 }
 
-export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistration }: WaitlistFormProps) {
+export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistFormProps) {
   const { content } = useSiteContent();
   const formContent = content.waitlistForm || {
     badge: 'Activación Comunitaria Territorial',
@@ -18,12 +17,12 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
     subtitle: 'El Barrio se habilitará primero en los sectores de Las Condes con mayor cantidad de vecinos y comercios inscritos.',
     quadrantsTitle: 'Estado de Activación Territorial en Las Condes',
     quadrant1Name: 'El Golf & Plaza Perú (Las Condes)',
-    quadrant1Progress: '92% de la meta vecinal alcanzada',
+    quadrant1Progress: 'Meta referencial: 92%',
     quadrant2Name: 'Av. Manquehue & Apumanque',
-    quadrant2Progress: '78% de la meta vecinal alcanzada',
+    quadrant2Progress: 'Meta referencial: 78%',
     quadrant3Name: 'Colón Oriente & Rotonda Atenas',
-    quadrant3Progress: '65% de la meta vecinal alcanzada',
-    privacyText: 'Tus datos son 100% privados y solo se utilizarán para validar tu cuadrante y notificarte el día de activación oficial de tu sector.',
+    quadrant3Progress: 'Meta referencial: 65%',
+    privacyText: 'Tus datos se usarán únicamente para gestionar tu inscripción y avisarte de la activación de tu cuadrante.',
     btnVecino: 'Quiero ser parte de mi barrio en Las Condes',
     btnComercio: 'Registrar mi comercio en el cuadrante',
     btnServicio: 'Registrar mi servicio profesional'
@@ -46,34 +45,44 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState('');
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!nombre.trim() || !correo.trim() || !whatsapp.trim()) {
       return;
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
     const selectedCommune = comuna === 'Otra comuna' ? (otraComuna.trim() || 'Las Condes') : comuna;
 
-    setTimeout(() => {
-      const newEntry: WaitlistEntry = {
-        id: 'w-' + Date.now(),
-        nombre: nombre.trim(),
-        correo: correo.trim(),
-        whatsapp: whatsapp.trim(),
-        comuna: selectedCommune,
-        tipo_registro: selectedRole,
-        nombreNegocio: nombreNegocio.trim() || undefined,
-        rubro: rubro.trim() || undefined,
-        fecha: new Date().toISOString().replace('T', ' ').substring(0, 16)
-      };
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participantType: selectedRole,
+          nombre: nombre.trim(),
+          correo: correo.trim(),
+          whatsapp: whatsapp.trim(),
+          comuna: selectedCommune,
+          nombreNegocio: nombreNegocio.trim() || undefined,
+          rubro: rubro.trim() || undefined,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'No pudimos completar tu inscripción');
 
-      onAddRegistration(newEntry);
-      setIsSubmitting(false);
+      setReferralCode(result.referralCode || '');
       setSubmitted(true);
-    }, 600);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'No pudimos completar tu inscripción');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyLink = () => {
@@ -132,7 +141,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
             <div className="flex items-center gap-4 text-xs text-slate-500 font-medium pt-2">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
-                <span>Privacidad 100% protegida</span>
+                <span>Privacidad desde el diseño</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
@@ -144,7 +153,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
 
           {/* Right Column: Wide Registration Form Container */}
           <div className="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-emerald-900/10 shadow-xl">
-            
+
             {/* Role Selection Tabs */}
             <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl mb-8 text-xs sm:text-sm font-bold">
               <button
@@ -316,6 +325,13 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
                 </div>
 
                 {/* Submit Button */}
+                {submitError && (
+                  <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -349,16 +365,16 @@ export function WaitlistFormSection({ selectedRole, onRoleChange, onAddRegistrat
 
                 <div className="space-y-2">
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                    ¡Registrado exitosamente, {nombre.split(' ')[0]}!
+                    ¡Ya eres parte, {nombre.split(' ')[0]}!
                   </h3>
                   <p className="text-slate-600 text-base leading-relaxed max-w-lg mx-auto">
-                    Has asegurado prioridad de activación en <strong className="text-slate-900">{comuna === 'Otra comuna' ? otraComuna : comuna}</strong> como <strong className="text-[#18B68B] uppercase">{selectedRole}</strong>.
+                    Registramos tu interés en <strong className="text-slate-900">{comuna === 'Otra comuna' ? otraComuna : comuna}</strong> como <strong className="text-[#18B68B] uppercase">{selectedRole}</strong>.
                   </p>
                 </div>
 
                 <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 text-sm text-emerald-900 font-medium space-y-2 max-w-lg mx-auto">
                   <p>
-                    Te enviaremos las credenciales de acceso beta tan pronto alcancemos la meta en tu sector.
+                    Tu inscripción quedó guardada correctamente.{referralCode && <> Tu código de invitación es <strong>{referralCode}</strong>.</>}
                   </p>
                 </div>
 

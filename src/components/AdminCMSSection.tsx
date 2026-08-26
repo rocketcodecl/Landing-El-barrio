@@ -41,7 +41,9 @@ export function AdminCMSSection() {
     exportContentJSON,
     importContentJSON,
     isVisualEditMode,
-    setIsVisualEditMode
+    setIsVisualEditMode,
+    saveStatus,
+    saveError
   } = useSiteContent();
 
   const [activeSubTab, setActiveSubTab] = useState<
@@ -142,21 +144,23 @@ export function AdminCMSSection() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="bg-[#18B68B] text-white text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">
-              CMS Live 100%
+              CMS conectado
             </span>
             <h4 className="font-extrabold text-base text-white">Editor Global de Contenido, Textos, Imágenes y Logos</h4>
           </div>
           <p className="text-xs text-slate-300">
-            Los cambios se aplican en tiempo real en la página y se guardan automáticamente en tu navegador.
+            Los cambios se aplican en tiempo real y se guardan automáticamente en el servidor.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {saveSuccessMsg && (
+          {saveStatus === 'saved' && (
             <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1.5 rounded-xl border border-emerald-500/30 flex items-center gap-1.5 animate-in fade-in">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> Guardado
             </span>
           )}
+          {saveStatus === 'saving' && <span className="rounded-xl border border-amber-400/30 bg-amber-500/20 px-3 py-1.5 text-xs font-bold text-amber-200">Guardando…</span>}
+          {saveStatus === 'error' && <span title={saveError || ''} className="rounded-xl border border-red-400/30 bg-red-500/20 px-3 py-1.5 text-xs font-bold text-red-200">Error al guardar</span>}
 
           <button
             onClick={exportContentJSON}

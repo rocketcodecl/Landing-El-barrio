@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { FAQItem, LocalBusiness, NeighborhoodPost, SiteContent } from '../types';
 import { DEFAULT_SITE_CONTENT } from '../data/defaultSiteContent';
 
@@ -32,6 +32,8 @@ interface SiteContentContextType {
   setIsVisualEditMode: (active: boolean) => void;
   activeEditSection: string | null;
   setActiveEditSection: (section: string | null) => void;
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error';
+  saveError: string | null;
 }
 
 const STORAGE_KEY = 'elbarrio_live_site_content_v2';
@@ -39,41 +41,73 @@ const STORAGE_KEY = 'elbarrio_live_site_content_v2';
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
 export function SiteContentProvider({ children }: { children: React.ReactNode }) {
-  const [content, setContent] = useState<SiteContent>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          ...DEFAULT_SITE_CONTENT,
-          ...parsed,
-          branding: { ...DEFAULT_SITE_CONTENT.branding, ...(parsed.branding || {}) },
-          hero: { ...DEFAULT_SITE_CONTENT.hero, ...(parsed.hero || {}) },
-          benefits: { ...DEFAULT_SITE_CONTENT.benefits, ...(parsed.benefits || {}) },
-          trust: { ...DEFAULT_SITE_CONTENT.trust, ...(parsed.trust || {}) },
-          localAds: { ...DEFAULT_SITE_CONTENT.localAds, ...(parsed.localAds || {}) },
-          waitlistForm: { ...DEFAULT_SITE_CONTENT.waitlistForm, ...(parsed.waitlistForm || {}) },
-          footer: { ...DEFAULT_SITE_CONTENT.footer, ...(parsed.footer || {}) },
-          posts: parsed.posts || DEFAULT_SITE_CONTENT.posts,
-          businesses: parsed.businesses || DEFAULT_SITE_CONTENT.businesses,
-          faqs: parsed.faqs || DEFAULT_SITE_CONTENT.faqs,
-        };
-      }
-    } catch (e) {
-      console.error('Error loading stored content:', e);
-    }
-    return DEFAULT_SITE_CONTENT;
-  });
+  const [content, setContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const remoteReadyRef = useRef(false);
+  const lastRemoteContentRef = useRef(JSON.stringify(DEFAULT_SITE_CONTENT));
 
   const [isVisualEditMode, setIsVisualEditMode] = useState<boolean>(false);
   const [activeEditSection, setActiveEditSection] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-    } catch (e) {
-      console.error('Error saving content to localStorage:', e);
-    }
+    let cancelled = false;
+    fetch('/api/site-content')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('No fue posible cargar el contenido publicado');
+        return response.json();
+      })
+      .then(({ content: remoteContent }) => {
+        if (cancelled) return;
+        if (remoteContent && typeof remoteContent === 'object') {
+          const merged = {
+            ...DEFAULT_SITE_CONTENT,
+            ...remoteContent,
+            branding: { ...DEFAULT_SITE_CONTENT.branding, ...(remoteContent.branding || {}) },
+            hero: { ...DEFAULT_SITE_CONTENT.hero, ...(remoteContent.hero || {}) },
+            benefits: { ...DEFAULT_SITE_CONTENT.benefits, ...(remoteContent.benefits || {}) },
+            trust: { ...DEFAULT_SITE_CONTENT.trust, ...(remoteContent.trust || {}) },
+            localAds: { ...DEFAULT_SITE_CONTENT.localAds, ...(remoteContent.localAds || {}) },
+            waitlistForm: { ...DEFAULT_SITE_CONTENT.waitlistForm, ...(remoteContent.waitlistForm || {}) },
+            footer: { ...DEFAULT_SITE_CONTENT.footer, ...(remoteContent.footer || {}) },
+          } as SiteContent;
+          lastRemoteContentRef.current = JSON.stringify(merged);
+          setContent(merged);
+        }
+        remoteReadyRef.current = true;
+      })
+      .catch((error) => {
+        console.error(error);
+        remoteReadyRef.current = true;
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!remoteReadyRef.current) return;
+    const serialized = JSON.stringify(content);
+    if (serialized === lastRemoteContentRef.current) return;
+    setSaveStatus('saving');
+    setSaveError(null);
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch('/api/site-content', {
+          method: 'PUT',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        });
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.error || 'No fue posible guardar el contenido');
+        lastRemoteContentRef.current = serialized;
+        localStorage.setItem(STORAGE_KEY, serialized);
+        setSaveStatus('saved');
+      } catch (error) {
+        setSaveStatus('error');
+        setSaveError(error instanceof Error ? error.message : 'Error al guardar');
+      }
+    }, 700);
+    return () => window.clearTimeout(timer);
   }, [content]);
 
   const updateContent = (newContent: SiteContent) => {
@@ -215,6 +249,8 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
         setIsVisualEditMode,
         activeEditSection,
         setActiveEditSection,
+        saveStatus,
+        saveError,
       }}
     >
       {children}

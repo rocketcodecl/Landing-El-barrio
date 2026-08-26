@@ -5,7 +5,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   branding: {
     appName: 'El Barrio',
     slogan: 'Super-app hiperlocal para comunidades y comercios de barrio',
-    customLogoUrl: '',
+    customLogoUrl: '/logo-el-barrio.png',
     customIsotypeUrl: '',
     primaryColor: '#18B68B',
     supportEmail: 'contacto@elbarrio.lat',
@@ -22,7 +22,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ctaComercio: 'Soy comercio o servicio local',
     communesHighlight: 'Activando cuadrantes prioritarios en Las Condes (El Golf, Plaza Perú, Manquehue, Colón y San Damián)',
     simulatorSector: 'Sector El Golf • Las Condes',
-    simulatorNeighborsCount: '342 vecinos activos en tu cuadrante',
+    simulatorNeighborsCount: 'Ejemplo de un cuadrante activo',
   },
   posts: INITIAL_POSTS,
   benefits: {
@@ -97,7 +97,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       {
         id: 'p-5',
         title: 'Moderación & Reportes',
-        description: 'Herramientas de reporte en 1 clic y revisión activa 24/7. Retiro inmediato de contenido inapropiado o conducta abusiva.'
+        description: 'Herramientas de reporte y revisión de contenido para abordar publicaciones inapropiadas o conductas abusivas.'
       },
       {
         id: 'p-6',
@@ -125,12 +125,12 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     subtitle: 'El Barrio se habilitará primero en los sectores de Las Condes con mayor cantidad de vecinos y comercios inscritos.',
     quadrantsTitle: 'ESTADO DE ACTIVACIÓN',
     quadrant1Name: 'El Golf & Plaza Perú (Las Condes)',
-    quadrant1Progress: '92% de la meta vecinal alcanzada',
+    quadrant1Progress: 'Meta referencial: 92%',
     quadrant2Name: 'Av. Manquehue & Apumanque',
-    quadrant2Progress: '78% de la meta vecinal alcanzada',
+    quadrant2Progress: 'Meta referencial: 78%',
     quadrant3Name: 'Colón Oriente & Rotonda Atenas',
-    quadrant3Progress: '65% de la meta vecinal alcanzada',
-    privacyText: 'Tus datos son 100% privados y solo se utilizarán para validar tu cuadrante y notificarte el día de activación oficial de tu sector.',
+    quadrant3Progress: 'Meta referencial: 65%',
+    privacyText: 'Tus datos se usarán únicamente para gestionar tu inscripción y avisarte de la activación de tu cuadrante.',
     btnVecino: 'Inscribirme como Vecino',
     btnComercio: 'Inscribir mi Comercio Local',
     btnServicio: 'Inscribir mi Servicio Vecinal'

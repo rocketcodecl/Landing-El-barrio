@@ -20,7 +20,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
     ctaComercio: 'Soy comercio o servicio local',
     communesHighlight: 'Activando cuadrantes prioritarios en Las Condes (El Golf, Plaza Perú, Manquehue, Colón y San Damián)',
     simulatorSector: 'Sector El Golf • Las Condes',
-    simulatorNeighborsCount: '342 vecinos activos en tu cuadrante',
+    simulatorNeighborsCount: 'Ejemplo de un cuadrante activo',
   };
 
   const [activeTab, setActiveTab] = useState<'feed' | 'mercado' | 'mapa' | 'alertas'>('feed');
@@ -76,7 +76,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
             <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-700 font-medium py-1">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
-                <span>100% Vecinos verificados</span>
+                <span>Verificación por residencia</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
@@ -112,6 +112,9 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
           {/* Right Column: Interactive Smartphone App Showcase */}
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-[300px] sm:max-w-[320px]">
+              <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                Vista interactiva · contenido de ejemplo
+              </p>
               
               {/* Decorative Glow Elements */}
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#18B68B]/20 rounded-full blur-2xl pointer-events-none" />
@@ -157,6 +160,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                   <div className="bg-slate-100/80 p-1 flex gap-1 border-b border-slate-200/60 text-xs font-semibold">
                     <button
                       onClick={() => setActiveTab('feed')}
+                      aria-pressed={activeTab === 'feed'}
                       className={`flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer ${
                         activeTab === 'feed'
                           ? 'bg-white text-[#18B68B] shadow-xs font-bold'
@@ -167,6 +171,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                     </button>
                     <button
                       onClick={() => setActiveTab('mercado')}
+                      aria-pressed={activeTab === 'mercado'}
                       className={`flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer ${
                         activeTab === 'mercado'
                           ? 'bg-white text-[#18B68B] shadow-xs font-bold'
@@ -177,6 +182,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                     </button>
                     <button
                       onClick={() => setActiveTab('mapa')}
+                      aria-pressed={activeTab === 'mapa'}
                       className={`flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer ${
                         activeTab === 'mapa'
                           ? 'bg-white text-[#18B68B] shadow-xs font-bold'
@@ -187,6 +193,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                     </button>
                     <button
                       onClick={() => setActiveTab('alertas')}
+                      aria-pressed={activeTab === 'alertas'}
                       className={`flex-1 py-1.5 rounded-lg transition-all text-center cursor-pointer ${
                         activeTab === 'alertas'
                           ? 'bg-white text-[#18B68B] shadow-xs font-bold'
