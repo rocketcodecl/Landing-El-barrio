@@ -255,7 +255,11 @@ export const INITIAL_ANALYTICS: SiteAnalytics = {
     { source: 'WhatsApp Directo', percentage: 48 },
     { source: 'Búsqueda Orgánica', percentage: 32 },
     { source: 'Recomendación Vecinal', percentage: 20 }
-  ]
+  ],
+  pathsViewed24h: 0,
+  visitsLast7: [],
+  liveVisitors: [],
+  recentVisitors: [],
 };
 
 export const INITIAL_WAITLIST: WaitlistEntry[] = [

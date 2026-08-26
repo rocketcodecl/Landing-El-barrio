@@ -15,6 +15,10 @@ const EMPTY_ANALYTICS: SiteAnalytics = {
   uniqueVisitors: 0,
   topPages: [],
   visitorSources: [],
+  pathsViewed24h: 0,
+  visitsLast7: [],
+  liveVisitors: [],
+  recentVisitors: [],
 };
 
 export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModalProps) {
@@ -63,8 +67,13 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
         topPages: data.topPages || [],
         visitorSources: (data.visitorSources || []).map((item: any) => ({
           source: item.source,
+          visits: item.visits,
           percentage: totalSources ? Math.round((item.visits / totalSources) * 100) : 0,
         })),
+        pathsViewed24h: data.pathsViewed24h || 0,
+        visitsLast7: data.visitsLast7 || [],
+        liveVisitors: data.liveVisitors || [],
+        recentVisitors: data.recentVisitors || [],
       });
     }
   }, []);
@@ -124,6 +133,26 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
 
     return matchesSearch && matchesType;
   });
+
+  const waitlistByType = {
+    vecino: waitlistEntries.filter((entry) => entry.tipo_registro === 'vecino').length,
+    comercio: waitlistEntries.filter((entry) => entry.tipo_registro === 'comercio').length,
+    servicio: waitlistEntries.filter((entry) => entry.tipo_registro === 'servicio').length,
+  };
+  const waitlistLast7 = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(Date.now() - (6 - offset) * 86400000);
+    const key = date.toISOString().slice(0, 10);
+    return {
+      key,
+      label: new Intl.DateTimeFormat('es-CL', { weekday: 'short' }).format(date).replace('.', ''),
+      count: waitlistEntries.filter((entry) => entry.fecha.slice(0, 10) === key).length,
+    };
+  });
+  const communeCounts = (Object.entries(waitlistEntries.reduce<Record<string, number>>((result, entry) => {
+    const commune = entry.comuna || 'Sin comuna';
+    result[commune] = (result[commune] || 0) + 1;
+    return result;
+  }, {})) as Array<[string, number]>).sort((a, b) => b[1] - a[1]);
 
   if (authenticated !== true) {
     return (
@@ -341,69 +370,56 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
 
           {/* TAB 2: ANALYTICS */}
           {activeTab === 'analytics' && (
-            <div className="space-y-6">
-              
-              {/* Stat Cards Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-                  <span className="text-xs text-slate-500 font-medium">Visitantes Activos</span>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h4 className="text-2xl font-black text-slate-900">{analytics.activeVisitors}</h4>
-                  </div>
-                </div>
-
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-                  <span className="text-xs text-slate-500 font-medium">Visitas Hoy</span>
-                  <h4 className="text-2xl font-black text-slate-900 mt-1">{analytics.dailyVisits.toLocaleString()}</h4>
-                </div>
-
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-                  <span className="text-xs text-slate-500 font-medium">Visitas Totales</span>
-                  <h4 className="text-2xl font-black text-slate-900 mt-1">{analytics.totalVisits.toLocaleString()}</h4>
-                </div>
-
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-                  <span className="text-xs text-slate-500 font-medium">Visitantes Únicos</span>
-                  <h4 className="text-2xl font-black text-[#18B68B] mt-1">{analytics.uniqueVisitors.toLocaleString()}</h4>
-                </div>
+            <div className="space-y-4 text-slate-900">
+              <div>
+                <h3 className="text-base font-black">Visitantes</h3>
+                <p className="text-xs text-slate-500">Quién está viendo tu sitio ahora y de dónde viene.</p>
               </div>
 
-              {/* Traffic Sources Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-                  <h4 className="font-bold text-slate-900 text-sm">Origen de Visitantes</h4>
-                  <div className="space-y-2 text-xs">
-                    {analytics.visitorSources.map((src, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between font-medium text-slate-700">
-                          <span>{src.source}</span>
-                          <span className="font-bold">{src.percentage}%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-[#18B68B] h-full rounded-full" 
-                            style={{ width: `${src.percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
+              <section className="rounded-2xl border border-emerald-300 bg-gradient-to-br from-emerald-50 to-white p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">◉ Visitantes en vivo</p>
+                    <div className="mt-1 flex items-center gap-2"><strong className="text-3xl text-[#0E9F7A]">{analytics.activeVisitors}</strong><span className="text-xs text-slate-500">visitantes activos</span><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /></div>
                   </div>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-black uppercase text-emerald-800">Conectado</span>
                 </div>
+                <div className="mt-4 grid gap-5 md:grid-cols-2">
+                  <div><p className="mb-2 text-[10px] font-black uppercase text-slate-500">Viendo ahora</p>{analytics.liveVisitors.length ? analytics.liveVisitors.map((visitor, index) => <p key={`${visitor.path}-${index}`} className="mb-1 text-xs font-bold">{visitor.path}</p>) : <p className="text-xs text-slate-400">Sin datos todavía</p>}</div>
+                  <div><p className="mb-2 text-[10px] font-black uppercase text-slate-500">De dónde vienen</p>{analytics.liveVisitors.length ? analytics.liveVisitors.map((visitor, index) => <p key={`${visitor.referrer}-${index}`} className="mb-1 truncate text-xs">{visitor.referrer}</p>) : <p className="text-xs text-slate-400">Sin datos todavía</p>}</div>
+                </div>
+                <div className="mt-4 border-t border-emerald-100 pt-3"><p className="mb-2 text-[10px] font-black uppercase text-slate-500">Recientes</p>{analytics.recentVisitors.length ? <div className="grid gap-1 sm:grid-cols-2">{analytics.recentVisitors.slice(0, 6).map((visitor, index) => <p key={`${visitor.createdAt}-${index}`} className="truncate text-xs text-slate-600">{visitor.path} · {visitor.referrer}</p>)}</div> : <p className="text-xs text-slate-400">Sin visitantes recientes</p>}</div>
+              </section>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
-                  <h4 className="font-bold text-slate-900 text-sm">Páginas Más Visitadas</h4>
-                  <div className="space-y-2 text-xs">
-                    {analytics.topPages.map((page, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-slate-50">
-                        <span className="font-mono font-bold text-slate-800">{page.path}</span>
-                        <span className="text-slate-500 font-semibold">{page.visits.toLocaleString()} visitas</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {[
+                  ['Visitantes hoy', analytics.dailyVisits],
+                  ['Visitantes total', analytics.totalVisits],
+                  ['Visitas únicas 24h', analytics.uniqueVisitors],
+                  ['Páginas vistas 24h', analytics.pathsViewed24h],
+                ].map(([label, value], index) => <div key={String(label)} className={`rounded-xl border p-4 ${index === 0 ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}`}><p className="text-[10px] font-bold uppercase text-slate-500">{label}</p><strong className="mt-1 block text-2xl">{Number(value).toLocaleString()}</strong></div>)}
               </div>
 
+              <div className="grid gap-4 md:grid-cols-2">
+                <section className="min-h-44 rounded-xl border border-slate-200 bg-white p-4"><h4 className="text-xs font-black">De dónde vienen (24h)</h4><div className="mt-5 space-y-3">{analytics.visitorSources.length ? analytics.visitorSources.map((source) => <div key={source.source}><div className="flex justify-between text-xs"><span className="truncate">{source.source}</span><strong>{source.visits ?? 0}</strong></div><div className="mt-1 h-1.5 overflow-hidden rounded bg-slate-100"><div className="h-full bg-[#18B68B]" style={{ width: `${source.percentage}%` }} /></div></div>) : <p className="py-10 text-center text-xs text-slate-400">Sin datos todavía</p>}</div></section>
+                <section className="min-h-44 rounded-xl border border-slate-200 bg-white p-4"><h4 className="text-xs font-black">Visitas · últimos 7 días</h4><div className="mt-6 flex h-24 items-end gap-2">{analytics.visitsLast7.map((day) => { const max = Math.max(1, ...analytics.visitsLast7.map((item) => item.visits)); return <div key={day.date} className="flex h-full flex-1 flex-col justify-end text-center"><span className="text-[10px] font-bold">{day.visits}</span><div className="mt-1 min-h-px bg-[#18B68B]" style={{ height: `${Math.max(2, (day.visits / max) * 70)}px` }} /><span className="mt-1 text-[9px] text-slate-400">{day.label}</span></div>; })}</div></section>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {[
+                  ['Total lista de espera', waitlistEntries.length],
+                  ['Vecinos', waitlistByType.vecino],
+                  ['Comercios', waitlistByType.comercio],
+                  ['Servicios', waitlistByType.servicio],
+                ].map(([label, value], index) => <div key={String(label)} className={`rounded-xl border p-4 ${index === 0 ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}`}><p className="text-[10px] font-bold uppercase text-slate-500">{label}</p><strong className="mt-1 block text-2xl">{value}</strong></div>)}
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <section className="min-h-40 rounded-xl border border-slate-200 bg-white p-4"><h4 className="text-xs font-black">Registros · últimos 7 días</h4><div className="mt-5 flex h-20 items-end gap-2">{waitlistLast7.map((day) => { const max = Math.max(1, ...waitlistLast7.map((item) => item.count)); return <div key={day.key} className="flex h-full flex-1 flex-col justify-end text-center"><span className="text-[10px] font-bold">{day.count}</span><div className="mt-1 min-h-px bg-[#18B68B]" style={{ height: `${Math.max(2, (day.count / max) * 55)}px` }} /><span className="mt-1 text-[9px] text-slate-400">{day.label}</span></div>; })}</div></section>
+                <section className="min-h-40 rounded-xl border border-slate-200 bg-white p-4"><h4 className="text-xs font-black">Por comuna</h4><div className="mt-4 space-y-3">{communeCounts.length ? communeCounts.slice(0, 8).map(([commune, count]) => <div key={commune} className="grid grid-cols-[minmax(90px,auto)_1fr_20px] items-center gap-3 text-xs"><span>{commune}</span><div className="h-1.5 rounded bg-slate-100"><div className="h-full rounded bg-[#18B68B]" style={{ width: `${(count / communeCounts[0][1]) * 100}%` }} /></div><strong>{count}</strong></div>) : <p className="py-8 text-center text-xs text-slate-400">Sin registros todavía</p>}</div></section>
+              </div>
+
+              <section className="overflow-hidden rounded-xl border border-slate-200 bg-white"><h4 className="border-b border-slate-200 px-4 py-3 text-xs font-black">Registros recientes</h4>{waitlistEntries.length ? waitlistEntries.slice(0, 8).map((entry) => <div key={entry.id} className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-4 py-3 last:border-0"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#18B68B] text-xs font-black text-white">{entry.nombre.charAt(0).toUpperCase()}</span><div className="min-w-0 flex-1"><p className="truncate text-xs font-bold">{entry.nombre}</p><p className="truncate text-[10px] text-slate-400">{entry.correo}</p></div><span className="rounded-full bg-blue-50 px-2 py-1 text-[9px] font-bold capitalize text-blue-700">{entry.tipo_registro}</span><span className="text-[10px] text-slate-500">{entry.comuna}</span><span className="text-[10px] text-slate-400">{entry.fecha.slice(0, 10)}</span></div>) : <p className="p-6 text-center text-xs text-slate-400">Sin registros todavía</p>}</section>
             </div>
           )}
 

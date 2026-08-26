@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { NeighborhoodPost, LocalBusiness, FAQItem } from '../types';
+import { UniversalContentEditor } from './UniversalContentEditor';
 import {
   Palette,
   Sparkles,
@@ -21,12 +22,17 @@ import {
   Eye,
   Layers,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Settings2,
+  Code2,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 
 export function AdminCMSSection() {
   const {
     content,
+    updateContent,
     updateSection,
     updatePost,
     addPost,
@@ -47,8 +53,8 @@ export function AdminCMSSection() {
   } = useSiteContent();
 
   const [activeSubTab, setActiveSubTab] = useState<
-    'branding' | 'hero' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
-  >('branding');
+    'layout' | 'all' | 'branding' | 'hero' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
+  >('layout');
 
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
@@ -56,10 +62,33 @@ export function AdminCMSSection() {
   const [importJsonText, setImportJsonText] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
+  const [fullEditorText, setFullEditorText] = useState(() => JSON.stringify(content, null, 2));
+  const [fullEditorError, setFullEditorError] = useState<string | null>(null);
 
   const notifySaved = () => {
     setSaveSuccessMsg(true);
     setTimeout(() => setSaveSuccessMsg(false), 2500);
+  };
+
+  const moveSection = (index: number, direction: -1 | 1) => {
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= content.layout.sections.length) return;
+    const sections = [...content.layout.sections];
+    [sections[index], sections[nextIndex]] = [sections[nextIndex], sections[index]];
+    updateSection('layout', { sections });
+    notifySaved();
+  };
+
+  const applyFullEditor = () => {
+    try {
+      const parsed = JSON.parse(fullEditorText);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('El contenido debe ser un objeto JSON');
+      updateContent(parsed);
+      setFullEditorError(null);
+      notifySaved();
+    } catch (error) {
+      setFullEditorError(error instanceof Error ? error.message : 'JSON inválido');
+    }
   };
 
   const handleAddNewPost = () => {
@@ -196,6 +225,8 @@ export function AdminCMSSection() {
       {/* Sub Tabs Bar */}
       <div className="flex flex-wrap gap-2 p-1.5 bg-slate-200/80 rounded-2xl border border-slate-300">
         {[
+          { id: 'layout', label: 'Estructura & Orden', icon: Settings2 },
+          { id: 'all', label: 'Control Total', icon: Code2 },
           { id: 'branding', label: 'Marca & Logos', icon: Palette },
           { id: 'hero', label: 'Hero Principal', icon: Sparkles },
           { id: 'posts', label: 'Feed ("Así se vive")', icon: MessageSquare },
@@ -212,7 +243,10 @@ export function AdminCMSSection() {
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveSubTab(tab.id as any)}
+              onClick={() => {
+                setActiveSubTab(tab.id as any);
+                if (tab.id === 'all') setFullEditorText(JSON.stringify(content, null, 2));
+              }}
               className={`text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
                 isActive
                   ? 'bg-white text-[#18B68B] shadow-sm'
@@ -225,6 +259,57 @@ export function AdminCMSSection() {
           );
         })}
       </div>
+
+      {activeSubTab === 'layout' && (
+        <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="text-lg font-black text-slate-900">Estructura completa de la landing</h3>
+            <p className="text-xs text-slate-500">Muestra, oculta y cambia el orden de todas las secciones públicas. Los cambios se guardan automáticamente.</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex items-center justify-between rounded-xl border border-slate-200 p-4 text-sm font-bold text-slate-800">
+              Mostrar encabezado
+              <input type="checkbox" checked={content.layout.headerVisible} onChange={(event) => updateSection('layout', { headerVisible: event.target.checked })} className="h-5 w-5 accent-[#18B68B]" />
+            </label>
+            <label className="flex items-center justify-between rounded-xl border border-slate-200 p-4 text-sm font-bold text-slate-800">
+              Mostrar pie de página
+              <input type="checkbox" checked={content.layout.footerVisible} onChange={(event) => updateSection('layout', { footerVisible: event.target.checked })} className="h-5 w-5 accent-[#18B68B]" />
+            </label>
+          </div>
+          <div className="space-y-2">
+            {content.layout.sections.map((section, index) => (
+              <div key={section.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <span className="w-7 text-center text-xs font-black text-slate-400">{index + 1}</span>
+                <input value={section.label} onChange={(event) => updateSection('layout', { sections: content.layout.sections.map((item) => item.id === section.id ? { ...item, label: event.target.value } : item) })} className="min-w-[180px] flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-bold" />
+                <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                  <input type="checkbox" checked={section.visible} onChange={(event) => updateSection('layout', { sections: content.layout.sections.map((item) => item.id === section.id ? { ...item, visible: event.target.checked } : item) })} className="h-4 w-4 accent-[#18B68B]" />
+                  Visible
+                </label>
+                <button onClick={() => moveSection(index, -1)} disabled={index === 0} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Subir sección"><ArrowUp className="h-4 w-4" /></button>
+                <button onClick={() => moveSection(index, 1)} disabled={index === content.layout.sections.length - 1} className="rounded-lg border border-slate-300 bg-white p-2 disabled:opacity-30" aria-label="Bajar sección"><ArrowDown className="h-4 w-4" /></button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeSubTab === 'all' && (
+        <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div className="border-b border-slate-100 pb-3">
+            <h3 className="text-lg font-black text-slate-900">Control total del contenido</h3>
+            <p className="text-xs leading-relaxed text-slate-500">Aquí puedes cambiar absolutamente todos los textos, imágenes, listas, botones, documentos legales, ejemplos, etiquetas y configuraciones guardadas por la landing. Exporta una copia antes de hacer cambios grandes.</p>
+          </div>
+          <UniversalContentEditor value={content as any} onChange={(nextContent) => { updateContent(nextContent as any); notifySaved(); }} />
+          <details className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <summary className="cursor-pointer text-sm font-black text-slate-800">Editor JSON avanzado</summary>
+            <div className="mt-4 space-y-3">
+              <textarea value={fullEditorText} onChange={(event) => setFullEditorText(event.target.value)} spellCheck={false} className="min-h-[480px] w-full rounded-xl border border-slate-300 bg-slate-950 p-4 font-mono text-xs leading-relaxed text-emerald-200 focus:ring-2 focus:ring-[#18B68B]" />
+              {fullEditorError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-800">{fullEditorError}</p>}
+              <div className="flex flex-wrap gap-3"><button onClick={applyFullEditor} className="rounded-xl bg-[#18B68B] px-5 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-[#15a27c]"><Save className="mr-2 inline h-4 w-4" />Aplicar JSON</button><button onClick={() => { setFullEditorText(JSON.stringify(content, null, 2)); setFullEditorError(null); }} className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700">Descartar cambios</button></div>
+            </div>
+          </details>
+        </div>
+      )}
 
       {/* SUB TAB 1: BRANDING & LOGOS */}
       {activeSubTab === 'branding' && (

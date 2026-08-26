@@ -33,25 +33,25 @@ export function Footer() {
 
             <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold bg-slate-800/80 w-fit px-3 py-1.5 rounded-lg border border-slate-700">
               <Globe className="w-3.5 h-3.5" />
-              <span>Dominio oficial: {domain}</span>
+              <span>{footer.officialDomainText || `Dominio oficial: ${domain}`}</span>
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Navegación</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{footer.navigationTitle}</h4>
             <ul className="space-y-2 text-sm text-slate-400 font-medium">
-              <li><a href="#asi-se-vive" className="hover:text-[#18B68B] transition-colors">Así se vive</a></li>
-              <li><a href="#beneficios" className="hover:text-[#18B68B] transition-colors">Beneficios</a></li>
-              <li><a href="#seguridad" className="hover:text-[#18B68B] transition-colors">Seguridad</a></li>
-              <li><a href="#comercios" className="hover:text-[#18B68B] transition-colors">Comercios</a></li>
-              <li><a href="#faq" className="hover:text-[#18B68B] transition-colors">Preguntas Frecuentes</a></li>
+              <li><a href="#asi-se-vive" className="hover:text-[#18B68B] transition-colors">{content.navigation.sceneLabel}</a></li>
+              <li><a href="#beneficios" className="hover:text-[#18B68B] transition-colors">{content.navigation.benefitsLabel}</a></li>
+              <li><a href="#seguridad" className="hover:text-[#18B68B] transition-colors">{content.navigation.trustLabel}</a></li>
+              <li><a href="#comercios" className="hover:text-[#18B68B] transition-colors">{content.navigation.businessesLabel}</a></li>
+              <li><a href="#faq" className="hover:text-[#18B68B] transition-colors">{content.navigation.faqLabel}</a></li>
             </ul>
           </div>
 
           {/* Legal Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Legales & Comunidad</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{footer.legalTitle}</h4>
             <ul className="space-y-2 text-sm text-slate-400 font-medium">
               <li>
                 <button 
@@ -59,7 +59,7 @@ export function Footer() {
                   className="hover:text-[#18B68B] transition-colors flex items-center gap-1.5 text-left cursor-pointer"
                 >
                   <Shield className="w-3.5 h-3.5 text-[#18B68B]" />
-                  <span>Política de Privacidad</span>
+                  <span>{footer.privacyLabel}</span>
                 </button>
               </li>
               <li>
@@ -68,7 +68,7 @@ export function Footer() {
                   className="hover:text-[#18B68B] transition-colors flex items-center gap-1.5 text-left cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5 text-[#18B68B]" />
-                  <span>Términos y Condiciones</span>
+                  <span>{footer.termsLabel}</span>
                 </button>
               </li>
               <li>
@@ -77,7 +77,7 @@ export function Footer() {
                   className="hover:text-[#18B68B] transition-colors flex items-center gap-1.5 text-left cursor-pointer"
                 >
                   <Heart className="w-3.5 h-3.5 text-[#18B68B]" />
-                  <span>Normas de la Comunidad</span>
+                  <span>{footer.communityLabel}</span>
                 </button>
               </li>
             </ul>
@@ -85,7 +85,7 @@ export function Footer() {
 
           {/* Contact & Social */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Contacto Oficial</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">{footer.contactTitle}</h4>
             <div className="space-y-2 text-sm text-slate-400 font-medium">
               <a href={`mailto:${supportEmail}`} className="flex items-center gap-2 hover:text-white transition-colors">
                 <Mail className="w-4 h-4 text-[#18B68B]" />
@@ -103,7 +103,7 @@ export function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>{copyrightText}</p>
           <p className="flex items-center gap-1">
-            Diseñado para fortalecer comunidades en Chile
+            {footer.madeForText}
           </p>
         </div>
 

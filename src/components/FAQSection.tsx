@@ -5,16 +5,16 @@ import { useSiteContent } from '../context/SiteContentContext';
 
 type CategoryFilter = FAQCategory | 'all';
 
-const categoryLabels: Record<FAQCategory, string> = {
-  general: 'General',
-  seguridad: 'Seguridad',
-  comercios: 'Comercios',
-};
-
 export function FAQSection() {
   const { content } = useSiteContent();
   const faqs = content.faqs || [];
   const supportEmail = content.branding?.supportEmail || 'contacto@elbarrio.lat';
+  const section = content.faqSection;
+  const categoryLabels: Record<FAQCategory, string> = {
+    general: section.generalLabel,
+    seguridad: section.securityLabel,
+    comercios: section.businessesLabel,
+  };
 
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [openId, setOpenId] = useState<string | null>(faqs[0]?.id || null);
@@ -32,10 +32,10 @@ export function FAQSection() {
   };
 
   const categories = [
-    { id: 'all' as const, label: 'Todas', icon: HelpCircle, count: faqs.length },
-    { id: 'general' as const, label: 'General', icon: HelpCircle, count: faqs.filter((item) => item.category === 'general').length },
-    { id: 'seguridad' as const, label: 'Seguridad', icon: ShieldCheck, count: faqs.filter((item) => item.category === 'seguridad').length },
-    { id: 'comercios' as const, label: 'Comercios', icon: Store, count: faqs.filter((item) => item.category === 'comercios').length },
+    { id: 'all' as const, label: section.allLabel, icon: HelpCircle, count: faqs.length },
+    { id: 'general' as const, label: section.generalLabel, icon: HelpCircle, count: faqs.filter((item) => item.category === 'general').length },
+    { id: 'seguridad' as const, label: section.securityLabel, icon: ShieldCheck, count: faqs.filter((item) => item.category === 'seguridad').length },
+    { id: 'comercios' as const, label: section.businessesLabel, icon: Store, count: faqs.filter((item) => item.category === 'comercios').length },
   ];
 
   return (
@@ -48,22 +48,22 @@ export function FAQSection() {
           <div className="space-y-6 lg:sticky lg:top-28">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-emerald-800 shadow-sm">
               <HelpCircle className="h-4 w-4" aria-hidden="true" />
-              Respuestas claras
+              {section.badge}
             </div>
 
             <div className="space-y-4">
               <h2 className="text-4xl font-extrabold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl">
-                Lo importante, <span className="text-[#0E8067]">sin letra chica.</span>
+                {section.title} <span className="text-[#0E8067]">{section.titleHighlight}</span>
               </h2>
               <p className="max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
-                Cómo funciona El Barrio, qué protegemos y cómo pueden participar vecinos, comercios y servicios locales.
+                {section.subtitle}
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-slate-500">¿Te quedó alguna duda?</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-slate-500">{section.contactEyebrow}</p>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Escríbenos y conversemos sobre tu comuna o tu negocio local.
+                {section.contactText}
               </p>
               <a
                 href={`mailto:${supportEmail}`}

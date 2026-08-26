@@ -10,12 +10,14 @@ El trabajo corresponde exclusivamente al clon de `rocketcodecl/Landing-El-barrio
 
 ## Qué funciona con datos persistentes
 
-- Landing React + Vite + TypeScript con tipografía Plus Jakarta Sans y el logotipo oficial entregado.
+- Landing React + Vite + TypeScript con tipografía Lato, siguiendo la familia principal usada por WhatRuns, y el logotipo oficial entregado.
 - Formulario de inscripción conectado a `/api/waitlist`, con validación, control de duplicados, código de referido y almacenamiento persistente.
 - Panel actual de la landing accesible mediante `?admin=1`, protegido por la cuenta administrativa existente.
 - CMS conectado a `/api/site-content`; los cambios se guardan en el servidor. `localStorage` se conserva solo como respaldo del navegador.
 - Registros reales consultables en el panel y exportables como CSV.
 - Analytics propios: visitas, visitantes únicos, páginas, referencias y presencia en vivo, almacenados o calculados por el backend.
+- Dashboard de métricas con actividad en vivo, fuentes, páginas vistas, series de siete días, lista de espera por perfil y comuna, y registros recientes.
+- Editor total con controles para todos los campos persistentes, orden y visibilidad de secciones, además de edición JSON avanzada.
 - API Express ejecutada como servicio de sistema y expuesta únicamente mediante el proxy HTTPS de `/api/`.
 - Copia automática horaria de los datos persistentes, con retención de 30 días.
 
@@ -29,7 +31,7 @@ El trabajo corresponde exclusivamente al clon de `rocketcodecl/Landing-El-barrio
 
 ## Diseño aplicado
 
-- Se instaló Plus Jakarta Sans como familia tipográfica principal.
+- Se instaló Lato como familia tipográfica principal.
 - Se sustituyó la marca tipográfica anterior por el logotipo PNG oficial.
 - Se rediseñó por completo la sección de preguntas frecuentes, incluida su jerarquía, navegación por categorías, acordeón, estados y adaptación móvil.
 - Se mantuvo oculto el acceso administrativo de la navegación pública.

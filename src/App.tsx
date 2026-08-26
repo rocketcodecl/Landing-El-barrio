@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { LiveNeighborhoodScene } from './components/LiveNeighborhoodScene';
@@ -10,12 +10,17 @@ import { FAQSection } from './components/FAQSection';
 import { WaitlistFormSection } from './components/WaitlistFormSection';
 import { Footer } from './components/Footer';
 import { AdminPanelModal } from './components/AdminPanelModal';
-import { SiteContentProvider } from './context/SiteContentContext';
+import { SiteContentProvider, useSiteContent } from './context/SiteContentContext';
 import { Edit3 } from 'lucide-react';
 
 import { RegistrationType } from './types';
 
 export default function App() {
+  return <SiteContentProvider><LandingPage /></SiteContentProvider>;
+}
+
+function LandingPage() {
+  const { content } = useSiteContent();
   const [selectedRole, setSelectedRole] = useState<RegistrationType>('vecino');
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [adminDefaultTab, setAdminDefaultTab] = useState<'cms' | 'registros' | 'analytics' | 'integraciones'>('cms');
@@ -62,59 +67,37 @@ export default function App() {
     setAdminModalOpen(true);
   };
 
+  const renderSection = (sectionId: string) => {
+    switch (sectionId) {
+      case 'hero': return <Hero onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
+      case 'scene': return <LiveNeighborhoodScene />;
+      case 'benefits': return <ThreeBenefits onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
+      case 'trust': return <TrustSection />;
+      case 'businesses': return <BusinessSection onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
+      case 'localAds': return <LocalAdSection onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
+      case 'faq': return <FAQSection />;
+      case 'waitlist': return <WaitlistFormSection selectedRole={selectedRole} onRoleChange={setSelectedRole} />;
+      default: return null;
+    }
+  };
+
   return (
-    <SiteContentProvider>
       <div className="min-h-screen bg-[#FAFDFB] text-slate-800 flex flex-col font-sans selection:bg-[#18B68B]/20 selection:text-[#18B68B] relative">
         
         {/* 1. Header */}
-        <Header
+        {content.layout.headerVisible && <Header
           onScrollToSection={handleScrollToSection}
           onSelectRoleForm={(role) => setSelectedRole(role)}
-        />
+        />}
 
         <main className="flex-1">
-          {/* 2. Hero Section */}
-          <Hero
-            onSelectRole={(role) => setSelectedRole(role)}
-            onScrollToForm={() => handleScrollToSection('registro')}
-          />
-
-          {/* 3. Live Neighborhood Scene ("Así se vive El Barrio") */}
-          <LiveNeighborhoodScene />
-
-          {/* 4. Three Benefits (Conecta • Resuelve • Cuida) */}
-          <ThreeBenefits
-            onSelectRole={(role) => setSelectedRole(role)}
-            onScrollToForm={() => handleScrollToSection('registro')}
-          />
-
-          {/* 5. Trust & Security */}
-          <TrustSection />
-
-          {/* 6. Shops & Service Providers */}
-          <BusinessSection
-            onSelectRole={(role) => setSelectedRole(role)}
-            onScrollToForm={() => handleScrollToSection('registro')}
-          />
-
-          {/* 7. Targeted Hyperlocal Visibility */}
-          <LocalAdSection
-            onSelectRole={(role) => setSelectedRole(role)}
-            onScrollToForm={() => handleScrollToSection('registro')}
-          />
-
-          {/* 8. FAQ Accordion */}
-          <FAQSection />
-
-          {/* 9. Final Call to Action & Waitlist Form */}
-          <WaitlistFormSection
-            selectedRole={selectedRole}
-            onRoleChange={(role) => setSelectedRole(role)}
-          />
+          {content.layout.sections.filter((section) => section.visible).map((section) => (
+            <Fragment key={section.id}>{renderSection(section.id)}</Fragment>
+          ))}
         </main>
 
         {/* 10. Footer */}
-        <Footer />
+        {content.layout.footerVisible && <Footer />}
 
         {/* Floating Quick CMS Access Button for Administrator */}
         {adminPreviewEnabled && (
@@ -128,7 +111,7 @@ export default function App() {
               <div className="w-6 h-6 rounded-full bg-[#0E8067] group-hover:bg-white text-white group-hover:text-[#0E8067] flex items-center justify-center transition-colors">
                 <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
               </div>
-              <span className="hidden sm:inline">CMS local · Demo</span>
+              <span className="hidden sm:inline">Administrar landing</span>
               <span className="sm:hidden">CMS</span>
             </button>
           </div>
@@ -142,6 +125,5 @@ export default function App() {
           />
         )}
       </div>
-    </SiteContentProvider>
   );
 }

@@ -9,6 +9,8 @@ interface BusinessProps {
 export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps) {
   const { content } = useSiteContent();
   const businesses = content.businesses || [];
+  const section = content.businessSection;
+  const featureIcons = [MapPin, Tag, MessageSquare, TrendingUp];
 
   return (
     <section id="comercios" className="py-20 bg-emerald-950/5 border-b border-emerald-900/10">
@@ -18,67 +20,38 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
             <Store className="w-4 h-4 text-[#18B68B]" />
-            <span>Para Negocios & Prestadores de Servicios</span>
+            <span>{section.badge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Haz que tu negocio o servicio llegue a quienes <span className="text-[#18B68B]">realmente viven cerca</span>
+            {section.title} <span className="text-[#18B68B]">{section.titleHighlight}</span>
           </h2>
 
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Sin gastar fortuna en publicidad genérica que le aparece a gente al otro lado de la ciudad. Conecta con tus vecinos de a pie en tu mismo cuadrante.
+            {section.subtitle}
           </p>
         </div>
 
         {/* 4 Feature Columns for Businesses */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#18B68B] flex items-center justify-center font-bold mb-4">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-slate-900 text-base mb-1.5">Segmentación Real</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Tus ofertas y productos se despliegan directamente a los vecinos situados en tu rango caminable.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold mb-4">
-              <Tag className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-slate-900 text-base mb-1.5">Publica Promociones</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              ¿Sobró pan del día o tienes cupo libre en tu agenda? Lanza avisos relámpago con descuentos especiales.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold mb-4">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-slate-900 text-base mb-1.5">Contacto Directo</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Los vecinos te contactan directo por WhatsApp o chat sin comisiones de marketplace ni retención de dinero.
-            </p>
-          </div>
-
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold mb-4">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <h3 className="font-bold text-slate-900 text-base mb-1.5">Destacado en Mapa</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Consigue presencia visual destacada en el mapa del cuadrante para atraer flujo constante a tu local.
-            </p>
-          </div>
+          {section.features.map((feature, index) => {
+            const Icon = featureIcons[index % featureIcons.length];
+            return (
+              <div key={`${feature.title}-${index}`} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#18B68B] flex items-center justify-center font-bold mb-4"><Icon className="w-5 h-5" /></div>
+                <h3 className="font-bold text-slate-900 text-base mb-1.5">{feature.title}</h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{feature.description}</p>
+              </div>
+            );
+          })}
 
         </div>
 
         {/* Dynamic Local Business Cards */}
         <div className="mb-12">
           <h3 className="text-xl font-bold text-slate-900 text-center mb-6">
-            Ejemplos de perfiles para comercios y servicios locales
+            {section.profilesTitle}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -114,10 +87,10 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         <div className="mt-12 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 rounded-3xl p-6 sm:p-8 lg:p-10 border border-emerald-100 shadow-sm w-full text-center space-y-5">
           <div className="space-y-2">
             <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
-              ¿Tienes una tienda, almacén, cafetería o prestas servicios en tu barrio?
+              {section.actionTitle}
             </h3>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Regístrate hoy mismo para reservar el cupo exclusivo de tu negocio antes de la apertura oficial de tu cuadrante.
+              {section.actionText}
             </p>
           </div>
 
@@ -127,14 +100,14 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
               className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm text-sm"
             >
               <Store className="w-4 h-4 text-[#18B68B]" />
-              <span>Quiero sumar mi comercio</span>
+              <span>{section.commerceCta}</span>
             </button>
             <button
               onClick={() => { onSelectRole('servicio'); onScrollToForm(); }}
               className="w-full sm:w-auto bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold px-6 py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm text-sm"
             >
               <CheckCircle className="w-4 h-4" />
-              <span>Registrarme como prestador de servicio</span>
+              <span>{section.serviceCta}</span>
             </button>
           </div>
         </div>

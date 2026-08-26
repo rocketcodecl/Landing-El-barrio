@@ -8,49 +8,10 @@ interface ThreeBenefitsProps {
 
 export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsProps) {
   const { content } = useSiteContent();
-  const benefits = content.benefits || {};
-  
-  const b1 = benefits.benefit1 || {
-    tag: '01. Conecta',
-    title: 'Conoce a las personas que realmente viven cerca de ti',
-    description: 'El Barrio organiza la interacción por cuadrantes territoriales delimitados. Te conectas con vecinos reales de tu pasaje, edificio o manzana, fortaleciendo el tejido social de tu entorno.',
-    points: [
-      'Vecinos verificados mediante comprobación de residencia.',
-      'Perfiles transparentes con reputación comunitaria acumulada.',
-      'Redes comunitarias libres de ruido publicitario o spam masivo.'
-    ],
-    sampleTitle: 'Javier Valdés',
-    sampleSubtitle: 'Vecino Fundador • Sector El Golf, Las Condes',
-    sampleTag: '★ 5.0 reputación'
-  };
-
-  const b2 = benefits.benefit2 || {
-    tag: '02. Resuelve',
-    title: 'Mercado, arriendos, favores, regalos y servicios locales',
-    description: 'Resuelve tus necesidades diarias sin salir de la zona. Encuentra desde una escalera para arrendar por el fin de semana hasta un gasfiter recomendado por tus propios vecinos.',
-    points: [
-      'Arriendos de objetos y herramientas: No compres lo que solo usarás una vez.',
-      'Regalos y trueques: Dale segunda vida a muebles o plantas cerca.',
-      'Pagos directos: 0% comisión de la app, tratos por chat directo entre personas.'
-    ],
-    sampleTitle: 'Escalera telescópica 3.8m',
-    sampleSubtitle: 'Arriendo por día • A 200m de ti',
-    samplePrice: '$4.000 / día'
-  };
-
-  const b3 = benefits.benefit3 || {
-    tag: '03. Cuida',
-    title: 'Alertas comunitarias, información territorial y prevención',
-    description: 'Mantén a tu familia y vecinos informados sobre eventos de interés público, cortes de suministros, emergencias o mascotas extraviadas con prioridad de alerta.',
-    points: [
-      'Alertas jerarquizadas: Prioridad crítica, moderada o informativa.',
-      'Moderación y filtro: Retiro inmediato de falsas alarmas o spam.',
-      'Privacidad garantizada: Tu hogar resguardado en el cuadrante.'
-    ],
-    sampleTitle: 'Corte programado de agua potable por reparaciones',
-    sampleSubtitle: 'Sector Apoquindo / Manquehue • Aviso municipal verificado',
-    sampleTag: 'Confirmado por moderador'
-  };
+  const benefits = content.benefits;
+  const b1 = benefits.benefit1;
+  const b2 = benefits.benefit2;
+  const b3 = benefits.benefit3;
 
   return (
     <section id="beneficios" className="py-20 bg-[#FAFDFB]">
@@ -102,7 +63,7 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
               onClick={() => { onSelectRole('vecino'); onScrollToForm(); }}
               className="inline-flex items-center gap-2 text-[#18B68B] font-bold text-sm hover:text-[#15a27c] transition-colors group cursor-pointer"
             >
-              <span>Sumarme a la comunidad de mi sector</span>
+              <span>{b1.cta}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -129,14 +90,14 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed italic">
-                  "El Barrio nos permitió organizar la limpieza de la plaza y prestarnos herramientas entre casas sin tener que meter a 200 desconocidos en un chat masivo."
+                  “{b1.sampleBody}”
                 </p>
 
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pt-1">
                   <span className="flex items-center gap-1 text-[#18B68B]">
-                    <MapPin className="w-3.5 h-3.5" /> A 120 metros de tu casa
+                    <MapPin className="w-3.5 h-3.5" /> {b1.sampleMetaLeft}
                   </span>
-                  <span>14 tratos coordinados</span>
+                  <span>{b1.sampleMetaRight}</span>
                 </div>
               </div>
             </div>
@@ -176,7 +137,7 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
               onClick={() => { onSelectRole('vecino'); onScrollToForm(); }}
               className="inline-flex items-center gap-2 text-purple-700 font-bold text-sm hover:text-purple-800 transition-colors group cursor-pointer"
             >
-              <span>Explorar oportunidades cerca</span>
+              <span>{b2.cta}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -204,11 +165,11 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
                       🎁
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Cuna de bebé impecable</h4>
-                      <p className="text-xs text-slate-500">Donación • Retiro en condominio</p>
+                      <h4 className="font-bold text-slate-900 text-sm">{b2.secondarySampleTitle}</h4>
+                      <p className="text-xs text-slate-500">{b2.secondarySampleSubtitle}</p>
                     </div>
                   </div>
-                  <span className="font-extrabold text-emerald-600 text-sm">¡Gratis!</span>
+                  <span className="font-extrabold text-emerald-600 text-sm">{b2.secondarySamplePrice}</span>
                 </div>
 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
@@ -217,12 +178,12 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
                       🔧
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 text-sm">Gasfitería SEC Verificada</h4>
-                      <p className="text-xs text-slate-500">Vecino Don Hernán • 32 recomendaciones</p>
+                      <h4 className="font-bold text-slate-900 text-sm">{b2.tertiarySampleTitle}</h4>
+                      <p className="text-xs text-slate-500">{b2.tertiarySampleSubtitle}</p>
                     </div>
                   </div>
                   <span className="text-xs bg-slate-100 text-slate-700 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5 text-[#18B68B]" /> Chat directo
+                    <MessageSquare className="w-3.5 h-3.5 text-[#18B68B]" /> {b2.tertiarySamplePrice}
                   </span>
                 </div>
 
@@ -264,7 +225,7 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
               onClick={() => { onSelectRole('vecino'); onScrollToForm(); }}
               className="inline-flex items-center gap-2 text-red-700 font-bold text-sm hover:text-red-800 transition-colors group cursor-pointer"
             >
-              <span>Activar alertas de mi cuadrante</span>
+              <span>{b3.cta}</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -285,8 +246,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
                   {b3.sampleSubtitle || 'Sector Apoquindo / Manquehue • Aviso municipal verificado'}
                 </p>
                 <div className="flex items-center justify-between pt-2 text-xs text-slate-500 font-semibold">
-                  <span>88 vecinos notificados</span>
-                  <span className="text-[#18B68B]">✓ Confirmado por moderador</span>
+                  <span>{b3.sampleMetaLeft}</span>
+                  <span className="text-[#18B68B]">{b3.sampleMetaRight}</span>
                 </div>
               </div>
             </div>

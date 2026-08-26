@@ -66,7 +66,11 @@ export interface SiteAnalytics {
   totalVisits: number;
   uniqueVisitors: number;
   topPages: { path: string; visits: number }[];
-  visitorSources: { source: string; percentage: number }[];
+  visitorSources: { source: string; percentage: number; visits?: number }[];
+  pathsViewed24h: number;
+  visitsLast7: { date: string; label: string; visits: number }[];
+  liveVisitors: { path: string; referrer: string; lastSeen: number }[];
+  recentVisitors: { path: string; referrer: string; createdAt: string }[];
 }
 
 export interface BrandingConfig {
@@ -91,6 +95,13 @@ export interface HeroConfig {
   communesHighlight: string;
   simulatorSector: string;
   simulatorNeighborsCount: string;
+  highlights: string[];
+  previewLabel: string;
+  verifiedLabel: string;
+  tabFeed: string;
+  tabMarket: string;
+  tabMap: string;
+  tabAlerts: string;
 }
 
 export interface BenefitItemConfig {
@@ -102,6 +113,16 @@ export interface BenefitItemConfig {
   sampleSubtitle: string;
   samplePrice?: string;
   sampleTag?: string;
+  cta: string;
+  sampleBody?: string;
+  sampleMetaLeft?: string;
+  sampleMetaRight?: string;
+  secondarySampleTitle?: string;
+  secondarySampleSubtitle?: string;
+  secondarySamplePrice?: string;
+  tertiarySampleTitle?: string;
+  tertiarySampleSubtitle?: string;
+  tertiarySamplePrice?: string;
 }
 
 export interface BenefitsConfig {
@@ -161,17 +182,150 @@ export interface FooterConfig {
   supportEmail: string;
   locationNotice: string;
   copyrightText: string;
+  navigationTitle: string;
+  legalTitle: string;
+  contactTitle: string;
+  privacyLabel: string;
+  termsLabel: string;
+  communityLabel: string;
+  madeForText: string;
+}
+
+export type LandingSectionId = 'hero' | 'scene' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faq' | 'waitlist';
+
+export interface LandingSectionConfig {
+  id: LandingSectionId;
+  label: string;
+  visible: boolean;
+}
+
+export interface LayoutConfig {
+  headerVisible: boolean;
+  footerVisible: boolean;
+  sections: LandingSectionConfig[];
+}
+
+export interface NavigationConfig {
+  sceneLabel: string;
+  benefitsLabel: string;
+  trustLabel: string;
+  businessesLabel: string;
+  faqLabel: string;
+  desktopCta: string;
+  mobileNeighborCta: string;
+  mobileBusinessCta: string;
+}
+
+export interface SectionIntroConfig {
+  badge: string;
+  title: string;
+  titleHighlight: string;
+  subtitle: string;
+}
+
+export interface SceneConfig extends SectionIntroConfig {
+  filterAll: string;
+  filterRent: string;
+  filterGifts: string;
+  filterBusinesses: string;
+  filterHelp: string;
+  filterAlerts: string;
+  bannerTitle: string;
+  bannerText: string;
+  bannerCta: string;
+}
+
+export interface BusinessFeatureConfig {
+  title: string;
+  description: string;
+}
+
+export interface BusinessSectionConfig extends SectionIntroConfig {
+  features: BusinessFeatureConfig[];
+  profilesTitle: string;
+  actionTitle: string;
+  actionText: string;
+  commerceCta: string;
+  serviceCta: string;
+}
+
+export interface FAQSectionConfig extends SectionIntroConfig {
+  allLabel: string;
+  generalLabel: string;
+  securityLabel: string;
+  businessesLabel: string;
+  contactEyebrow: string;
+  contactText: string;
+  contactButton: string;
+}
+
+export interface FormUIConfig {
+  activationLabel: string;
+  privacyBadge: string;
+  noHiddenCostsBadge: string;
+  roleNeighbor: string;
+  roleBusiness: string;
+  roleService: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  businessNameLabel: string;
+  businessNamePlaceholder: string;
+  businessCategoryLabel: string;
+  businessCategoryPlaceholder: string;
+  serviceCategoryLabel: string;
+  serviceCategoryPlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+  communeLabel: string;
+  otherCommuneLabel: string;
+  otherCommunePlaceholder: string;
+  submittingText: string;
+  successTitle: string;
+  successMessage: string;
+  savedText: string;
+  shareEyebrow: string;
+  shareText: string;
+  whatsappMessage: string;
+  shareWhatsapp: string;
+  copyLink: string;
+  copiedLink: string;
+}
+
+export interface LegalBlock {
+  heading: string;
+  body: string;
+}
+
+export interface LegalDocumentConfig {
+  title: string;
+  intro: string;
+  blocks: LegalBlock[];
+}
+
+export interface LegalConfig {
+  privacy: LegalDocumentConfig;
+  terms: LegalDocumentConfig;
+  community: LegalDocumentConfig;
 }
 
 export interface SiteContent {
+  layout: LayoutConfig;
+  navigation: NavigationConfig;
   branding: BrandingConfig;
   hero: HeroConfig;
+  scene: SceneConfig;
   posts: NeighborhoodPost[];
   benefits: BenefitsConfig;
   trust: TrustConfig;
   businesses: LocalBusiness[];
+  businessSection: BusinessSectionConfig;
   localAds: LocalAdsConfig;
   faqs: FAQItem[];
+  faqSection: FAQSectionConfig;
   waitlistForm: WaitlistFormConfig;
+  formUI: FormUIConfig;
   footer: FooterConfig;
+  legal: LegalConfig;
 }

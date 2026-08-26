@@ -10,6 +10,7 @@ interface LiveSceneProps {
 export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
   const { content } = useSiteContent();
   const posts = content.posts || [];
+  const scene = content.scene;
 
   const [activeFilter, setActiveFilter] = useState<string>('todos');
   const [likedPosts, setLikedPosts] = useState<Record<string, number>>({});
@@ -61,26 +62,26 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#18B68B] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Vista referencial de la experiencia</span>
+            <span>{scene.badge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Así se vive <span className="text-[#18B68B]">El Barrio</span> cada día
+            {scene.title} <span className="text-[#18B68B]">{scene.titleHighlight}</span>
           </h2>
 
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Ejemplos de cómo vecinos, comercios y servicios podrían encontrarse dentro de un mismo cuadrante.
+            {scene.subtitle}
           </p>
 
           {/* Filter Pills */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-4" role="group" aria-label="Filtrar ejemplos de publicaciones">
             {[
-              { id: 'todos', label: 'Todos los avisos' },
-              { id: 'mercado', label: '🛒 Mercado & Arriendos' },
-              { id: 'regalo', label: '🎁 Regalos & Trueques' },
-              { id: 'ayuda', label: '🤝 Ayuda & Servicios' },
-              { id: 'comercio', label: '🏪 Promos Locales' },
-              { id: 'alerta', label: '⚠️ Alertas Vecinales' },
+              { id: 'todos', label: scene.filterAll },
+              { id: 'mercado', label: scene.filterRent },
+              { id: 'regalo', label: scene.filterGifts },
+              { id: 'ayuda', label: scene.filterHelp },
+              { id: 'comercio', label: scene.filterBusinesses },
+              { id: 'alerta', label: scene.filterAlerts },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -208,10 +209,10 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
         <div className="mt-12 bg-gradient-to-r from-emerald-900 to-slate-900 rounded-2xl p-6 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-1 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-extrabold">
-              ¿Tienes algo para vender, regalar o arreglar en tu sector?
+              {scene.bannerTitle}
             </h3>
             <p className="text-emerald-200 text-sm max-w-xl">
-              Publica en segundos y conversa directamente con tus vecinos por chat seguro. Sin intermediarios ni cobros.
+              {scene.bannerText}
             </p>
           </div>
 
@@ -219,7 +220,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
             href="#registro"
             className="whitespace-nowrap bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all cursor-pointer"
           >
-            Publicar en mi barrio
+            {scene.bannerCta}
           </a>
         </div>
 

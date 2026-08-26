@@ -27,6 +27,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
     btnComercio: 'Registrar mi comercio en el cuadrante',
     btnServicio: 'Registrar mi servicio profesional'
   };
+  const ui = content.formUI;
 
   const quadrants = [
     { id: 'q-1', name: formContent.quadrant1Name || 'El Golf & Plaza Perú (Las Condes)', progress: formContent.quadrant1Progress || '92%' },
@@ -92,7 +93,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
   };
 
   const handleShareWhatsApp = () => {
-    const text = encodeURIComponent('¡Hola! Me acabo de sumar a la activación de El Barrio para conectar con nuestros vecinos en Las Condes. ¡Súmate tú también en https://elbarrio.lat!');
+    const text = encodeURIComponent(ui.whatsappMessage);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
@@ -123,7 +124,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-[#18B68B]" />
-                  <span>ESTADO DE ACTIVACIÓN</span>
+                  <span>{formContent.quadrantsTitle || ui.activationLabel}</span>
                 </span>
               </div>
 
@@ -141,11 +142,11 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
             <div className="flex items-center gap-4 text-xs text-slate-500 font-medium pt-2">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
-                <span>Privacidad desde el diseño</span>
+                <span>{ui.privacyBadge}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
-                <span>Sin costos ocultos</span>
+                <span>{ui.noHiddenCostsBadge}</span>
               </div>
             </div>
 
@@ -166,7 +167,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                 }`}
               >
                 <Users className="w-4 h-4" />
-                <span>Vecino</span>
+                <span>{ui.roleNeighbor}</span>
               </button>
 
               <button
@@ -179,7 +180,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                 }`}
               >
                 <Store className="w-4 h-4" />
-                <span>Comercio</span>
+                <span>{ui.roleBusiness}</span>
               </button>
 
               <button
@@ -192,7 +193,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                 }`}
               >
                 <Wrench className="w-4 h-4" />
-                <span>Servicio</span>
+                <span>{ui.roleService}</span>
               </button>
             </div>
 
@@ -203,14 +204,14 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Nombre completo <span className="text-red-500">*</span>
+                      {ui.nameLabel} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
                       value={nombre}
                       onChange={(e) => setNombre(e.target.value)}
-                      placeholder="Ej: Carolina Morales"
+                      placeholder={ui.namePlaceholder}
                       className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                     />
                   </div>
@@ -219,27 +220,27 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                     <>
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                          Nombre de tu local / negocio <span className="text-red-500">*</span>
+                          {ui.businessNameLabel} <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           required
                           value={nombreNegocio}
                           onChange={(e) => setNombreNegocio(e.target.value)}
-                          placeholder="Ej: Almacén El Golf"
+                          placeholder={ui.businessNamePlaceholder}
                           className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                         />
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                          Rubro comercial <span className="text-red-500">*</span>
+                          {ui.businessCategoryLabel} <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           required
                           value={rubro}
                           onChange={(e) => setRubro(e.target.value)}
-                          placeholder="Ej: Cafetería, Minimarket, Verdulería"
+                          placeholder={ui.businessCategoryPlaceholder}
                           className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                         />
                       </div>
@@ -249,14 +250,14 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                   {selectedRole === 'servicio' && (
                     <div className="sm:col-span-2">
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Oficio o servicio que realizas <span className="text-red-500">*</span>
+                        {ui.serviceCategoryLabel} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         required
                         value={rubro}
                         onChange={(e) => setRubro(e.target.value)}
-                        placeholder="Ej: Gasfitería autorizada, Clases particulares, Electricista, Taller de bicis"
+                        placeholder={ui.serviceCategoryPlaceholder}
                         className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                       />
                     </div>
@@ -264,35 +265,35 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Correo electrónico <span className="text-red-500">*</span>
+                      {ui.emailLabel} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
                       required
                       value={correo}
                       onChange={(e) => setCorreo(e.target.value)}
-                      placeholder="tu@correo.cl"
+                      placeholder={ui.emailPlaceholder}
                       className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      WhatsApp / Celular <span className="text-red-500">*</span>
+                      {ui.phoneLabel} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="tel"
                       required
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(e.target.value)}
-                      placeholder="+56 9 1234 5678"
+                      placeholder={ui.phonePlaceholder}
                       className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                     />
                   </div>
 
                   <div className={comuna === 'Otra comuna' ? 'sm:col-span-1' : 'sm:col-span-2'}>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      Comuna en Chile <span className="text-red-500">*</span>
+                      {ui.communeLabel} <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={comuna}
@@ -310,14 +311,14 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                   {comuna === 'Otra comuna' && (
                     <div>
                       <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                        Especifica tu comuna <span className="text-red-500">*</span>
+                        {ui.otherCommuneLabel} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         required
                         value={otraComuna}
                         onChange={(e) => setOtraComuna(e.target.value)}
-                        placeholder="Nombre de tu comuna"
+                        placeholder={ui.otherCommunePlaceholder}
                         className="w-full px-4 py-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#18B68B] focus:border-transparent text-sm bg-slate-50/50"
                       />
                     </div>
@@ -338,7 +339,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                   className="w-full bg-[#18B68B] hover:bg-[#15a27c] text-white font-extrabold py-4 px-6 rounded-xl shadow-lg shadow-[#18B68B]/25 hover:shadow-xl transition-all flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-50 mt-4"
                 >
                   {isSubmitting ? (
-                    <span>Registrando tu cupo...</span>
+                    <span>{ui.submittingText}</span>
                   ) : (
                     <>
                       <span>
@@ -365,26 +366,26 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
 
                 <div className="space-y-2">
                   <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-                    ¡Ya eres parte, {nombre.split(' ')[0]}!
+                    {ui.successTitle.replace('{nombre}', nombre.split(' ')[0] || nombre)}
                   </h3>
                   <p className="text-slate-600 text-base leading-relaxed max-w-lg mx-auto">
-                    Registramos tu interés en <strong className="text-slate-900">{comuna === 'Otra comuna' ? otraComuna : comuna}</strong> como <strong className="text-[#18B68B] uppercase">{selectedRole}</strong>.
+                    {ui.successMessage.replace('{comuna}', comuna === 'Otra comuna' ? otraComuna : comuna).replace('{rol}', selectedRole)}
                   </p>
                 </div>
 
                 <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 text-sm text-emerald-900 font-medium space-y-2 max-w-lg mx-auto">
                   <p>
-                    Tu inscripción quedó guardada correctamente.{referralCode && <> Tu código de invitación es <strong>{referralCode}</strong>.</>}
+                    {ui.savedText}{referralCode && <> Tu código de invitación es <strong>{referralCode}</strong>.</>}
                   </p>
                 </div>
 
                 {/* Share & Viral Loop */}
                 <div className="pt-6 border-t border-slate-100 space-y-4 max-w-lg mx-auto">
                   <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    ¡Acelera la apertura de tu cuadrante en Las Condes!
+                    {ui.shareEyebrow}
                   </p>
                   <p className="text-xs text-slate-500">
-                    Mientras más vecinos se sumen, antes activamos las publicaciones y beneficios en tu zona.
+                    {ui.shareText}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
@@ -392,14 +393,14 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                       className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
                     >
                       <Share2 className="w-4 h-4" />
-                      <span>Compartir por WhatsApp</span>
+                      <span>{ui.shareWhatsapp}</span>
                     </button>
                     <button
                       onClick={handleCopyLink}
                       className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
                     >
                       {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                      <span>{copiedLink ? '¡Enlace copiado!' : 'Copiar enlace'}</span>
+                      <span>{copiedLink ? ui.copiedLink : ui.copyLink}</span>
                     </button>
                   </div>
                 </div>

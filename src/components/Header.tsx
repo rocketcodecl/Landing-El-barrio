@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X, ShieldCheck, ArrowRight, Store, Users } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
+import { useSiteContent } from '../context/SiteContentContext';
 
 interface HeaderProps {
   onScrollToSection: (sectionId: string) => void;
@@ -8,6 +9,8 @@ interface HeaderProps {
 }
 
 export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
+  const { content } = useSiteContent();
+  const navigation = content.navigation;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (id: string) => {
@@ -46,32 +49,32 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               onClick={() => handleNavClick('asi-se-vive')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
-              Así se vive
+              {navigation.sceneLabel}
             </button>
             <button 
               onClick={() => handleNavClick('beneficios')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
-              Beneficios
+              {navigation.benefitsLabel}
             </button>
             <button 
               onClick={() => handleNavClick('seguridad')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1 flex items-center gap-1.5"
             >
               <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
-              Seguridad
+              {navigation.trustLabel}
             </button>
             <button 
               onClick={() => handleNavClick('comercios')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
-              Comercios
+              {navigation.businessesLabel}
             </button>
             <button 
               onClick={() => handleNavClick('faq')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
-              Preguntas
+              {navigation.faqLabel}
             </button>
           </nav>
 
@@ -81,7 +84,7 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               onClick={() => handleRoleClick('vecino')}
               className="bg-[#18B68B] hover:bg-[#15a27c] text-white text-sm font-bold px-5 py-2.5 rounded-xl shadow-md shadow-[#18B68B]/25 hover:shadow-lg hover:shadow-[#18B68B]/35 transition-all flex items-center gap-2 cursor-pointer active:scale-[0.98]"
             >
-              <span>Sumarme a mi barrio</span>
+              <span>{navigation.desktopCta}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -109,32 +112,32 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               onClick={() => handleNavClick('asi-se-vive')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
-              Así se vive El Barrio
+              {navigation.sceneLabel}
             </button>
             <button
               onClick={() => handleNavClick('beneficios')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
-              Tres Grandes Beneficios
+              {navigation.benefitsLabel}
             </button>
             <button
               onClick={() => handleNavClick('seguridad')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium flex items-center justify-between"
             >
-              <span>Seguridad & Confianza</span>
+              <span>{navigation.trustLabel}</span>
               <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
             </button>
             <button
               onClick={() => handleNavClick('comercios')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
-              Comercios y Servicios
+              {navigation.businessesLabel}
             </button>
             <button
               onClick={() => handleNavClick('faq')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
-              Preguntas Frecuentes
+              {navigation.faqLabel}
             </button>
           </div>
 
@@ -144,7 +147,7 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               className="w-full bg-[#18B68B] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md"
             >
               <Users className="w-4 h-4" />
-              <span>Quiero ser parte (Vecinos)</span>
+              <span>{navigation.mobileNeighborCta}</span>
             </button>
 
             <button
@@ -152,7 +155,7 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               className="w-full bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2"
             >
               <Store className="w-4 h-4 text-[#18B68B]" />
-              <span>Sumar mi Comercio</span>
+              <span>{navigation.mobileBusinessCta}</span>
             </button>
           </div>
         </div>

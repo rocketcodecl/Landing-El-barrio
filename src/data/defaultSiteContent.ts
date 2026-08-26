@@ -2,6 +2,30 @@ import { SiteContent } from '../types';
 import { INITIAL_POSTS, MOCK_BUSINESSES, FAQ_ITEMS } from './mockData';
 
 export const DEFAULT_SITE_CONTENT: SiteContent = {
+  layout: {
+    headerVisible: true,
+    footerVisible: true,
+    sections: [
+      { id: 'hero', label: 'Portada', visible: true },
+      { id: 'scene', label: 'Así se vive', visible: true },
+      { id: 'benefits', label: 'Beneficios', visible: true },
+      { id: 'trust', label: 'Seguridad', visible: true },
+      { id: 'businesses', label: 'Comercios', visible: true },
+      { id: 'localAds', label: 'Publicidad local', visible: true },
+      { id: 'faq', label: 'Preguntas frecuentes', visible: true },
+      { id: 'waitlist', label: 'Formulario', visible: true },
+    ],
+  },
+  navigation: {
+    sceneLabel: 'Así se vive',
+    benefitsLabel: 'Beneficios',
+    trustLabel: 'Seguridad',
+    businessesLabel: 'Comercios',
+    faqLabel: 'Preguntas',
+    desktopCta: 'Sumarme a mi barrio',
+    mobileNeighborCta: 'Quiero ser parte (Vecinos)',
+    mobileBusinessCta: 'Sumar mi Comercio',
+  },
   branding: {
     appName: 'El Barrio',
     slogan: 'Super-app hiperlocal para comunidades y comercios de barrio',
@@ -23,6 +47,28 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     communesHighlight: 'Activando cuadrantes prioritarios en Las Condes (El Golf, Plaza Perú, Manquehue, Colón y San Damián)',
     simulatorSector: 'Sector El Golf • Las Condes',
     simulatorNeighborsCount: 'Ejemplo de un cuadrante activo',
+    highlights: ['Verificación por residencia', 'Sin pagos dentro de la app', 'Privacidad de tu dirección'],
+    previewLabel: 'Vista interactiva · contenido de ejemplo',
+    verifiedLabel: 'Verificado',
+    tabFeed: 'En vivo',
+    tabMarket: 'Mercado',
+    tabMap: 'Mapa',
+    tabAlerts: 'Alertas',
+  },
+  scene: {
+    badge: 'Vista referencial de la experiencia',
+    title: 'Así se vive',
+    titleHighlight: 'El Barrio',
+    subtitle: 'Descubre publicaciones, datos y oportunidades que podrían aparecer en tu cuadrante.',
+    filterAll: 'Todo',
+    filterRent: 'Arriendos',
+    filterGifts: 'Regalos',
+    filterBusinesses: 'Comercios',
+    filterHelp: 'Ayuda vecinal',
+    filterAlerts: 'Alertas vecinales',
+    bannerTitle: '¿Tienes algo para vender, regalar o arreglar en tu sector?',
+    bannerText: 'Publica en segundos y conversa directamente con tus vecinos por chat seguro. Sin intermediarios ni cobros.',
+    bannerCta: 'Quiero ser parte',
   },
   posts: INITIAL_POSTS,
   benefits: {
@@ -40,7 +86,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       ],
       sampleTitle: 'Javier Valdés',
       sampleSubtitle: 'Vecino Fundador • Sector El Golf, Las Condes',
-      sampleTag: '★ 5.0 reputación'
+      sampleTag: '★ 5.0 reputación',
+      cta: 'Sumarme a la comunidad de mi sector',
+      sampleBody: 'El Barrio nos permitió organizar la limpieza de la plaza y prestarnos herramientas entre casas sin tener que meter a 200 desconocidos en un chat masivo.',
+      sampleMetaLeft: 'A 120 metros de tu casa',
+      sampleMetaRight: '14 tratos coordinados'
     },
     benefit2: {
       tag: '02. Resuelve',
@@ -53,7 +103,14 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       ],
       sampleTitle: 'Escalera telescópica 3.8m',
       sampleSubtitle: 'Arriendo por día • A 200m de ti',
-      samplePrice: '$4.000 / día'
+      samplePrice: '$4.000 / día',
+      cta: 'Explorar oportunidades cerca',
+      secondarySampleTitle: 'Cuna de bebé impecable',
+      secondarySampleSubtitle: 'Donación • Retiro en condominio',
+      secondarySamplePrice: '¡Gratis!',
+      tertiarySampleTitle: 'Gasfitería SEC Verificada',
+      tertiarySampleSubtitle: 'Vecino Don Hernán • 32 recomendaciones',
+      tertiarySamplePrice: 'Chat directo'
     },
     benefit3: {
       tag: '03. Cuida',
@@ -66,7 +123,10 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       ],
       sampleTitle: 'Corte programado de agua potable por reparaciones',
       sampleSubtitle: 'Sector Apoquindo / Manquehue • Aviso municipal verificado',
-      sampleTag: 'Confirmado por moderador'
+      sampleTag: 'Confirmado por moderador',
+      cta: 'Activar alertas de mi cuadrante',
+      sampleMetaLeft: '88 vecinos notificados',
+      sampleMetaRight: '✓ Confirmado por moderador'
     }
   },
   trust: {
@@ -109,6 +169,23 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     transparencyText: 'El Barrio es un sistema independiente de interacción vecinal directa. Todos los tratos, coordinaciones y pagos son gestionados libremente por las personas involucradas, sin comisiones de intermediación.'
   },
   businesses: MOCK_BUSINESSES,
+  businessSection: {
+    badge: 'Para Negocios & Prestadores de Servicios',
+    title: 'Haz que tu negocio o servicio llegue a quienes',
+    titleHighlight: 'realmente viven cerca',
+    subtitle: 'Conecta con clientes reales de tu mismo sector mediante presencia local relevante y contacto directo.',
+    features: [
+      { title: 'Segmentación Real', description: 'Llega a vecinos dentro de cuadrantes concretos, sin desperdiciar alcance.' },
+      { title: 'Publica Promociones', description: 'Comparte beneficios, novedades y ofertas para tu comunidad cercana.' },
+      { title: 'Contacto Directo', description: 'Recibe consultas por chat o WhatsApp sin comisiones de intermediación.' },
+      { title: 'Destacado en Mapa', description: 'Haz visible tu ubicación aproximada y facilita que te encuentren.' },
+    ],
+    profilesTitle: 'Ejemplos de perfiles para comercios y servicios locales',
+    actionTitle: '¿Tienes una tienda, almacén, cafetería o prestas servicios en tu barrio?',
+    actionText: 'Regístrate hoy mismo para reservar el cupo exclusivo de tu negocio antes de la apertura oficial de tu cuadrante.',
+    commerceCta: 'Quiero sumar mi comercio',
+    serviceCta: 'Registrarme como prestador de servicio',
+  },
   localAds: {
     badge: 'Difusión Local Dirigida',
     title: 'Publicidad local hiperlocal sin desperdiciar presupuesto',
@@ -119,6 +196,19 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     bullet3: 'Filtro por cuadrante exacto'
   },
   faqs: FAQ_ITEMS,
+  faqSection: {
+    badge: 'Preguntas frecuentes',
+    title: 'Lo importante,',
+    titleHighlight: 'sin letra chica.',
+    subtitle: 'Respuestas claras sobre cómo funciona El Barrio, la seguridad y la participación local.',
+    allLabel: 'Todas',
+    generalLabel: 'General',
+    securityLabel: 'Seguridad',
+    businessesLabel: 'Comercios',
+    contactEyebrow: '¿Te quedó alguna duda?',
+    contactText: 'Escríbenos y conversemos directamente.',
+    contactButton: 'Contactar al equipo',
+  },
   waitlistForm: {
     badge: 'Activación Comunitaria Territorial',
     title: 'Asegura tu cupo en el lanzamiento de tu cuadrante',
@@ -135,11 +225,80 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     btnComercio: 'Inscribir mi Comercio Local',
     btnServicio: 'Inscribir mi Servicio Vecinal'
   },
+  formUI: {
+    activationLabel: 'ESTADO DE ACTIVACIÓN',
+    privacyBadge: 'Privacidad desde el diseño',
+    noHiddenCostsBadge: 'Sin costos ocultos',
+    roleNeighbor: 'Vecino',
+    roleBusiness: 'Comercio',
+    roleService: 'Servicio',
+    nameLabel: 'Nombre completo',
+    namePlaceholder: 'Ej: Carolina Morales',
+    businessNameLabel: 'Nombre de tu local / negocio',
+    businessNamePlaceholder: 'Ej: Almacén El Golf',
+    businessCategoryLabel: 'Rubro comercial',
+    businessCategoryPlaceholder: 'Ej: Cafetería, Minimarket, Verdulería',
+    serviceCategoryLabel: 'Oficio o servicio que realizas',
+    serviceCategoryPlaceholder: 'Ej: Gasfitería autorizada, Clases particulares, Electricista',
+    emailLabel: 'Correo electrónico',
+    emailPlaceholder: 'tu@correo.cl',
+    phoneLabel: 'WhatsApp / Celular',
+    phonePlaceholder: '+56 9 1234 5678',
+    communeLabel: 'Comuna en Chile',
+    otherCommuneLabel: 'Especifica tu comuna',
+    otherCommunePlaceholder: 'Nombre de tu comuna',
+    submittingText: 'Registrando tu cupo...',
+    successTitle: '¡Tu inscripción quedó registrada!',
+    successMessage: 'Registramos tu interés en {comuna} como {rol}.',
+    savedText: 'Tu inscripción quedó guardada correctamente.',
+    shareEyebrow: '¡Acelera la apertura de tu cuadrante!',
+    shareText: 'Mientras más vecinos se sumen, antes activamos las publicaciones y beneficios en tu zona.',
+    whatsappMessage: '¡Hola! Me acabo de sumar a la activación de El Barrio. Súmate tú también en https://elbarrio.lat',
+    shareWhatsapp: 'Compartir por WhatsApp',
+    copyLink: 'Copiar enlace',
+    copiedLink: 'Enlace copiado',
+  },
   footer: {
     description: 'La super-app hiperlocal para conectar con tus vecinos de a pie, comprar, vender, regalar, arrendar herramientas y enterarte de la vida de tu entorno.',
     officialDomainText: 'Dominio oficial: https://elbarrio.lat',
     supportEmail: 'contacto@elbarrio.lat',
     locationNotice: 'Santiago, Chile • Proyecto en proceso de activación comunitaria en Las Condes.',
-    copyrightText: 'El Barrio (elbarrio.lat). Todos los derechos reservados.'
-  }
+    copyrightText: 'El Barrio (elbarrio.lat). Todos los derechos reservados.',
+    navigationTitle: 'Navegación',
+    legalTitle: 'Legales & Comunidad',
+    contactTitle: 'Contacto Oficial',
+    privacyLabel: 'Política de Privacidad',
+    termsLabel: 'Términos y Condiciones',
+    communityLabel: 'Normas de la Comunidad',
+    madeForText: 'Diseñado para fortalecer comunidades en Chile',
+  },
+  legal: {
+    privacy: {
+      title: 'Política de Privacidad',
+      intro: 'Dominio oficial: https://elbarrio.lat',
+      blocks: [
+        { heading: '1. Protección de tu Ubicación Exacta', body: 'En El Barrio entendemos la importancia crítica del resguardo del hogar. Tu dirección exacta de residencia nunca será visible públicamente. El sistema solo proyectará una aproximación por cuadrante o radio de cercanía.' },
+        { heading: '2. Datos Recopilados', body: 'Solicitamos nombre, correo electrónico, teléfono de contacto y comuna para gestionar la verificación y la lista de apertura comunitaria.' },
+        { heading: '3. Uso de la Información', body: 'Tus datos no serán vendidos. Serán utilizados para notificarte sobre la activación de tu barrio y habilitar las funciones solicitadas.' },
+      ],
+    },
+    terms: {
+      title: 'Términos y Condiciones',
+      intro: 'Condiciones generales de uso de El Barrio.',
+      blocks: [
+        { heading: '1. Transacciones y Pagos Directos', body: 'El Barrio no es una pasarela de pago. Los acuerdos se convienen directamente entre las personas involucradas.' },
+        { heading: '2. Responsabilidad sobre los Acuerdos', body: 'El Barrio facilita el contacto, pero no se responsabiliza por el estado de objetos o desacuerdos entre particulares.' },
+        { heading: '3. Verificación de Identidad', body: 'Los usuarios deben cumplir el proceso de verificación exigido para su sector.' },
+      ],
+    },
+    community: {
+      title: 'Normas de la Comunidad',
+      intro: 'Principios para una convivencia local segura y útil.',
+      blocks: [
+        { heading: '1. Respeto y Buena Convivencia', body: 'No se permite lenguaje de odio, acoso, discriminación o difamación.' },
+        { heading: '2. Prohibición de Spam', body: 'No se permite publicidad repetitiva no solicitada ni artículos prohibidos por ley.' },
+        { heading: '3. Alertas Responsables', body: 'Las alertas deben emitirse con responsabilidad y veracidad comprobable.' },
+      ],
+    },
+  },
 };

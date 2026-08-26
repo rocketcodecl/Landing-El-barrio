@@ -256,6 +256,15 @@ app.get('/api/analytics', requireAdmin, async (_req, res) => {
   for (const [key, value] of liveVisitors) if (now - value.lastSeen > 65000) liveVisitors.delete(key);
   const visits = await readJson('visits.json', []);
   const last24h = visits.filter((visit) => now - new Date(visit.createdAt).getTime() <= 24 * 60 * 60 * 1000);
+  const last7Days = Array.from({ length: 7 }, (_, offset) => {
+    const date = new Date(now - (6 - offset) * 24 * 60 * 60 * 1000);
+    const key = date.toISOString().slice(0, 10);
+    return {
+      date: key,
+      label: new Intl.DateTimeFormat('es-CL', { weekday: 'short' }).format(date).replace('.', ''),
+      visits: visits.filter((visit) => String(visit.createdAt || '').slice(0, 10) === key).length,
+    };
+  });
   const countBy = (items, key) => Object.entries(items.reduce((acc, item) => {
     const value = item[key] || 'direct';
     acc[value] = (acc[value] || 0) + 1;
@@ -266,8 +275,12 @@ app.get('/api/analytics', requireAdmin, async (_req, res) => {
     dailyVisits: visits.filter((visit) => new Date(visit.createdAt) >= startToday).length,
     totalVisits: visits.length,
     uniqueVisitors: new Set(last24h.map((visit) => visit.sessionId)).size,
+    pathsViewed24h: new Set(last24h.map((visit) => visit.path || '/')).size,
     topPages: countBy(last24h, 'path').map(({ name, count }) => ({ path: name, visits: count })),
     visitorSources: countBy(last24h, 'referrer').map(({ name, count }) => ({ source: name, visits: count })),
+    visitsLast7: last7Days,
+    liveVisitors: [...liveVisitors.values()].sort((a, b) => b.lastSeen - a.lastSeen),
+    recentVisitors: visits.slice(-8).reverse().map(({ path: visitPath, referrer, createdAt }) => ({ path: visitPath || '/', referrer: referrer || 'direct', createdAt })),
   });
 });
 

@@ -10,18 +10,7 @@ interface HeroProps {
 
 export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
   const { content } = useSiteContent();
-  const hero = content.hero || {
-    badge: 'La Super-App Hiperlocal para tu Vida Cotidiana',
-    titlePart1: 'Todo lo que pasa en',
-    titleHighlight: 'tu barrio',
-    titlePart2: ', en la palma de tu mano.',
-    description: 'Conecta con vecinos reales verificados de tu sector. Compra, vende, regala, arrienda herramientas por el fin de semana, encuentra datos de confianza y apoya al comercio local sin comisiones.',
-    ctaVecino: 'Sumarme a la lista de mi sector',
-    ctaComercio: 'Soy comercio o servicio local',
-    communesHighlight: 'Activando cuadrantes prioritarios en Las Condes (El Golf, Plaza Perú, Manquehue, Colón y San Damián)',
-    simulatorSector: 'Sector El Golf • Las Condes',
-    simulatorNeighborsCount: 'Ejemplo de un cuadrante activo',
-  };
+  const hero = content.hero;
 
   const [activeTab, setActiveTab] = useState<'feed' | 'mercado' | 'mapa' | 'alertas'>('feed');
 
@@ -74,18 +63,12 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
 
             {/* Value Highlights */}
             <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-700 font-medium py-1">
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
-                <span>Verificación por residencia</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
-                <span>Sin pagos dentro de la app</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
-                <span>Privacidad de tu dirección</span>
-              </div>
+              {hero.highlights.map((highlight) => (
+                <div key={highlight} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-[#18B68B]" />
+                  <span>{highlight}</span>
+                </div>
+              ))}
             </div>
 
             {/* CTA Group */}
@@ -113,7 +96,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-[300px] sm:max-w-[320px]">
               <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">
-                Vista interactiva · contenido de ejemplo
+                {hero.previewLabel}
               </p>
               
               {/* Decorative Glow Elements */}
@@ -151,7 +134,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                     </div>
                     <div>
                       <span className="text-[9px] bg-emerald-100 text-[#18B68B] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" /> Verificado
+                        <ShieldCheck className="w-3 h-3" /> {hero.verifiedLabel}
                       </span>
                     </div>
                   </div>
@@ -167,7 +150,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      En vivo
+                      {hero.tabFeed}
                     </button>
                     <button
                       onClick={() => setActiveTab('mercado')}
@@ -178,7 +161,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Mercado
+                      {hero.tabMarket}
                     </button>
                     <button
                       onClick={() => setActiveTab('mapa')}
@@ -189,7 +172,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Mapa
+                      {hero.tabMap}
                     </button>
                     <button
                       onClick={() => setActiveTab('alertas')}
@@ -200,7 +183,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
-                      Alertas
+                      {hero.tabAlerts}
                     </button>
                   </div>
 

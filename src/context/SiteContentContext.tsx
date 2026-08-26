@@ -40,6 +40,17 @@ const STORAGE_KEY = 'elbarrio_live_site_content_v2';
 
 const SiteContentContext = createContext<SiteContentContextType | undefined>(undefined);
 
+function mergeContent<T>(defaults: T, saved: unknown): T {
+  if (Array.isArray(defaults)) return (Array.isArray(saved) ? saved : defaults) as T;
+  if (defaults && typeof defaults === 'object') {
+    const source = saved && typeof saved === 'object' && !Array.isArray(saved) ? saved as Record<string, unknown> : {};
+    return Object.fromEntries(
+      Object.entries(defaults as Record<string, unknown>).map(([key, value]) => [key, mergeContent(value, source[key])]),
+    ) as T;
+  }
+  return (saved === undefined || saved === null ? defaults : saved) as T;
+}
+
 export function SiteContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -60,17 +71,7 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
       .then(({ content: remoteContent }) => {
         if (cancelled) return;
         if (remoteContent && typeof remoteContent === 'object') {
-          const merged = {
-            ...DEFAULT_SITE_CONTENT,
-            ...remoteContent,
-            branding: { ...DEFAULT_SITE_CONTENT.branding, ...(remoteContent.branding || {}) },
-            hero: { ...DEFAULT_SITE_CONTENT.hero, ...(remoteContent.hero || {}) },
-            benefits: { ...DEFAULT_SITE_CONTENT.benefits, ...(remoteContent.benefits || {}) },
-            trust: { ...DEFAULT_SITE_CONTENT.trust, ...(remoteContent.trust || {}) },
-            localAds: { ...DEFAULT_SITE_CONTENT.localAds, ...(remoteContent.localAds || {}) },
-            waitlistForm: { ...DEFAULT_SITE_CONTENT.waitlistForm, ...(remoteContent.waitlistForm || {}) },
-            footer: { ...DEFAULT_SITE_CONTENT.footer, ...(remoteContent.footer || {}) },
-          } as SiteContent;
+          const merged = mergeContent(DEFAULT_SITE_CONTENT, remoteContent);
           lastRemoteContentRef.current = JSON.stringify(merged);
           setContent(merged);
         }
