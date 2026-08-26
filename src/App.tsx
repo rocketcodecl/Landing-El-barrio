@@ -122,8 +122,8 @@ export default function App() {
             <button
               onClick={handleOpenCMS}
               className="group flex items-center gap-2.5 bg-slate-900 hover:bg-[#0E8067] text-white px-4 py-3 rounded-full shadow-2xl border border-slate-700 hover:border-[#0E8067] transition-all cursor-pointer text-xs font-bold active:scale-95"
-              aria-label="Abrir el CMS local de demostración"
-              title="Abrir CMS local (datos de demostración)"
+              aria-label="Abrir el panel de administración"
+              title="Abrir panel de administración"
             >
               <div className="w-6 h-6 rounded-full bg-[#0E8067] group-hover:bg-white text-white group-hover:text-[#0E8067] flex items-center justify-center transition-colors">
                 <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
