@@ -4,7 +4,7 @@ import { INITIAL_POSTS, MOCK_BUSINESSES, FAQ_ITEMS } from './mockData';
 export const DEFAULT_SITE_CONTENT: SiteContent = {
   theme: {
     fontFamily: 'Lato',
-    customFontImportUrl: 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap',
+    customFontImportUrl: '',
     baseFontSize: 16,
     navigationFontSize: 14,
     heroTitleDesktop: 60,

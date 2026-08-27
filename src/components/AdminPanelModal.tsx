@@ -34,9 +34,10 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
   const [analytics, setAnalytics] = useState<SiteAnalytics>(EMPTY_ANALYTICS);
 
   const loadAdminData = useCallback(async () => {
+    const signal = AbortSignal.timeout(8000);
     const [waitlistResponse, analyticsResponse] = await Promise.all([
-      fetch('/api/waitlist', { credentials: 'same-origin' }),
-      fetch('/api/analytics', { credentials: 'same-origin' }),
+      fetch('/api/waitlist', { credentials: 'same-origin', signal }),
+      fetch('/api/analytics', { credentials: 'same-origin', signal }),
     ]);
     if (waitlistResponse.status === 401 || analyticsResponse.status === 401) {
       setAuthenticated(false);
@@ -79,7 +80,7 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
   }, []);
 
   useEffect(() => {
-    fetch('/api/auth/status', { credentials: 'same-origin' })
+    fetch('/api/auth/status', { credentials: 'same-origin', signal: AbortSignal.timeout(8000) })
       .then((response) => response.json())
       .then((data) => setAuthenticated(Boolean(data.authenticated)))
       .catch(() => setAuthenticated(false));
@@ -87,8 +88,8 @@ export function AdminPanelModal({ onClose, defaultTab = 'cms' }: AdminPanelModal
 
   useEffect(() => {
     if (!authenticated) return;
-    loadAdminData();
-    const interval = window.setInterval(loadAdminData, 30000);
+    loadAdminData().catch(() => undefined);
+    const interval = window.setInterval(() => { if (document.visibilityState === 'visible') loadAdminData().catch(() => undefined); }, 60000);
     return () => window.clearInterval(interval);
   }, [authenticated, loadAdminData]);
 

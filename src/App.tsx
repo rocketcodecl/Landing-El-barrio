@@ -41,16 +41,23 @@ function LandingPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload()),
       keepalive: true,
+      signal: AbortSignal.timeout(5000),
     }).catch(() => undefined);
-    const sendHeartbeat = () => fetch('/api/analytics/live', {
+    const sendHeartbeat = () => {
+      if (document.visibilityState !== 'visible') return Promise.resolve();
+      return fetch('/api/analytics/live', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload()),
       keepalive: true,
+      signal: AbortSignal.timeout(5000),
     }).catch(() => undefined);
-    sendHeartbeat();
-    const interval = window.setInterval(sendHeartbeat, 30000);
-    return () => window.clearInterval(interval);
+    };
+    const startHeartbeat = () => sendHeartbeat();
+    if (document.readyState === 'complete') startHeartbeat();
+    else window.addEventListener('load', startHeartbeat, { once: true });
+    const interval = window.setInterval(sendHeartbeat, 60000);
+    return () => { window.clearInterval(interval); window.removeEventListener('load', startHeartbeat); };
   }, [adminRoute]);
 
   const handleScrollToSection = (sectionId: string) => {

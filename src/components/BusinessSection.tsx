@@ -58,6 +58,8 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
             {businesses.map(biz => (
               <div key={biz.id} className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-start gap-4">
                 <img 
+                  loading="lazy"
+                  decoding="async"
                   src={biz.avatar} 
                   alt={biz.name}
                   onError={(e) => {

@@ -63,7 +63,7 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/site-content')
+    fetch('/api/site-content', { signal: AbortSignal.timeout(8000) })
       .then(async (response) => {
         if (!response.ok) throw new Error('No fue posible cargar el contenido publicado');
         return response.json();
@@ -97,6 +97,7 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
           credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content }),
+          signal: AbortSignal.timeout(8000),
         });
         const body = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(body.error || 'No fue posible guardar el contenido');

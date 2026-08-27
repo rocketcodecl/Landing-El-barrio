@@ -196,7 +196,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                         <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <img className="w-7 h-7 rounded-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
+                              <img loading="lazy" decoding="async" className="w-7 h-7 rounded-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
                               <div>
                                 <h4 className="text-xs font-bold text-slate-900">Carlos M.</h4>
                                 <p className="text-[10px] text-slate-500">A 250m • Hace 15 min</p>
@@ -219,7 +219,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                         <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-xs space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <img className="w-7 h-7 rounded-full object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
+                              <img loading="lazy" decoding="async" className="w-7 h-7 rounded-full object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
                               <div>
                                 <h4 className="text-xs font-bold text-slate-900">María Paz S.</h4>
                                 <p className="text-[10px] text-slate-500">A 180m • Hace 42 min</p>
@@ -257,7 +257,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
                       <div className="space-y-2.5">
                         <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
                           <div className="flex gap-2">
-                            <img className="w-14 h-14 rounded-xl object-cover" src="https://images.unsplash.com/photo-1592417817098-8f3d6eb231fc?auto=format&fit=crop&w=200&q=80" alt="Césped" />
+                            <img loading="lazy" decoding="async" className="w-14 h-14 rounded-xl object-cover" src="https://images.unsplash.com/photo-1592417817098-8f3d6eb231fc?auto=format&fit=crop&w=200&q=80" alt="Césped" />
                             <div className="flex-1">
                               <span className="text-[9px] font-bold bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">Herramientas</span>
                               <h5 className="text-xs font-bold text-slate-900 mt-0.5">Cortadora de césped</h5>
@@ -272,7 +272,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
 
                         <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
                           <div className="flex gap-2">
-                            <img className="w-14 h-14 rounded-xl object-cover" src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=200&q=80" alt="Plantas" />
+                            <img loading="lazy" decoding="async" className="w-14 h-14 rounded-xl object-cover" src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=200&q=80" alt="Plantas" />
                             <div className="flex-1">
                               <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">Donación</span>
                               <h5 className="text-xs font-bold text-slate-900 mt-0.5">Maceteros de greda</h5>

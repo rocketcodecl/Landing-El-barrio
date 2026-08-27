@@ -46,7 +46,7 @@ export function SiteRuntimeSettings({ includeCustomCss = true }: { includeCustom
 
     const fontLinkId = 'cms-custom-font';
     document.getElementById(fontLinkId)?.remove();
-    if (/^https:\/\//i.test(theme.customFontImportUrl)) {
+    if (theme.fontFamily.toLowerCase() !== 'lato' && /^https:\/\//i.test(theme.customFontImportUrl)) {
       const link = document.createElement('link');
       link.id = fontLinkId;
       link.rel = 'stylesheet';

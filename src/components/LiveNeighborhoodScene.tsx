@@ -117,6 +117,8 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-2.5">
                       <img 
+                        loading="lazy"
+                        decoding="async"
                         src={post.author.avatar} 
                         alt={post.author.name}
                         className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20"
@@ -143,6 +145,8 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
                   {/* Post Image */}
                   <div className="relative h-48 sm:h-52 rounded-xl overflow-hidden mb-3.5 border border-slate-100 shadow-2xs group-hover:shadow-xs transition-shadow bg-slate-100">
                     <img 
+                      loading="lazy"
+                      decoding="async"
                       src={post.image} 
                       alt={post.title} 
                       onError={(e) => {
