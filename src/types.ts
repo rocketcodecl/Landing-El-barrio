@@ -97,8 +97,6 @@ export interface HeroConfig {
   simulatorNeighborsCount: string;
   highlights: string[];
   previewLabel: string;
-  previewImageUrl: string;
-  previewImageAlt: string;
   verifiedLabel: string;
   tabFeed: string;
   tabMarket: string;
@@ -235,12 +233,6 @@ export interface SceneConfig extends SectionIntroConfig {
   bannerTitle: string;
   bannerText: string;
   bannerCta: string;
-  story1ImageUrl: string;
-  story1Title: string;
-  story1Text: string;
-  story2ImageUrl: string;
-  story2Title: string;
-  story2Text: string;
 }
 
 export interface BusinessFeatureConfig {

@@ -63,42 +63,12 @@ export function AdminCMSSection() {
   const [importJsonText, setImportJsonText] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
-  const [heroImageUploading, setHeroImageUploading] = useState(false);
-  const [heroImageMessage, setHeroImageMessage] = useState<string | null>(null);
   const [fullEditorText, setFullEditorText] = useState(() => JSON.stringify(content, null, 2));
   const [fullEditorError, setFullEditorError] = useState<string | null>(null);
 
   const notifySaved = () => {
     setSaveSuccessMsg(true);
     setTimeout(() => setSaveSuccessMsg(false), 2500);
-  };
-
-  const uploadHeroImage = async (file: File) => {
-    setHeroImageUploading(true);
-    setHeroImageMessage(null);
-    try {
-      const dataBase64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ''));
-        reader.onerror = () => reject(new Error('No fue posible leer la imagen'));
-        reader.readAsDataURL(file);
-      });
-      const response = await fetch('/api/media', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, mimeType: file.type, dataBase64 }),
-      });
-      const body = await response.json().catch(() => ({}));
-      if (!response.ok || !body.url) throw new Error(body.error || 'No fue posible subir la imagen');
-      updateSection('hero', { previewImageUrl: body.url });
-      notifySaved();
-      setHeroImageMessage('Imagen actualizada. Se guardará automáticamente.');
-    } catch (error) {
-      setHeroImageMessage(error instanceof Error ? error.message : 'Error al subir la imagen');
-    } finally {
-      setHeroImageUploading(false);
-    }
   };
 
   const moveSection = (index: number, direction: -1 | 1) => {
@@ -530,24 +500,6 @@ export function AdminCMSSection() {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
-              <div className="grid items-center gap-4 md:grid-cols-[150px_1fr]">
-                <img src={content.hero.previewImageUrl} alt={content.hero.previewImageAlt} className="mx-auto max-h-60 w-auto max-w-full rounded-2xl bg-white object-contain shadow-sm" />
-                <div className="space-y-3">
-                  <div>
-                    <h4 className="text-sm font-black text-slate-900">Imagen del celular en la portada</h4>
-                    <p className="text-xs text-slate-600">Sube una imagen vertical y reemplázala sin tocar código.</p>
-                  </div>
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#18B68B] px-4 py-2.5 text-xs font-black text-white hover:bg-[#15a27c]">
-                    <Upload className="h-4 w-4" />{heroImageUploading ? 'Subiendo…' : 'Cambiar imagen'}
-                    <input type="file" accept="image/png,image/jpeg,image/webp" disabled={heroImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadHeroImage(file); event.target.value = ''; }} className="hidden" />
-                  </label>
-                  {heroImageMessage && <p className="text-xs font-bold text-slate-700">{heroImageMessage}</p>}
-                  <label className="block text-xs font-bold text-slate-700">URL de la imagen<input value={content.hero.previewImageUrl} onChange={(event) => updateSection('hero', { previewImageUrl: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 font-normal" /></label>
-                  <label className="block text-xs font-bold text-slate-700">Descripción accesible<input value={content.hero.previewImageAlt} onChange={(event) => updateSection('hero', { previewImageAlt: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 font-normal" /></label>
-                </div>
-              </div>
-            </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Badge Superior</label>
               <input
@@ -705,24 +657,6 @@ export function AdminCMSSection() {
               <Plus className="w-4 h-4" /> Agregar Publicación
             </button>
           </div>
-
-          <details className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
-            <summary className="cursor-pointer text-sm font-black text-slate-900">Fotos grandes de vida de barrio</summary>
-            <p className="mt-2 text-xs text-slate-600">Puedes subir imágenes en la pestaña “Imágenes” y pegar aquí sus URL.</p>
-            <div className="mt-4 grid gap-5 lg:grid-cols-2">
-              {([1, 2] as const).map((number) => {
-                const imageKey = `story${number}ImageUrl` as const;
-                const titleKey = `story${number}Title` as const;
-                const textKey = `story${number}Text` as const;
-                return <div key={number} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-                  <img src={content.scene[imageKey]} alt="" className="h-52 w-full rounded-xl object-cover" />
-                  <label className="block text-xs font-bold text-slate-700">URL de imagen<input value={content.scene[imageKey]} onChange={(event) => updateSection('scene', { [imageKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                  <label className="block text-xs font-bold text-slate-700">Título<input value={content.scene[titleKey]} onChange={(event) => updateSection('scene', { [titleKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                  <label className="block text-xs font-bold text-slate-700">Texto<textarea rows={3} value={content.scene[textKey]} onChange={(event) => updateSection('scene', { [textKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                </div>;
-              })}
-            </div>
-          </details>
 
           {/* Quick Image Presets Palette */}
           <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-2">
