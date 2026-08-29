@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { LiveNeighborhoodScene } from './components/LiveNeighborhoodScene';
+import { NeighborhoodStories } from './components/NeighborhoodStories';
 import { ThreeBenefits } from './components/ThreeBenefits';
 import { TrustSection } from './components/TrustSection';
 import { BusinessSection } from './components/BusinessSection';
@@ -70,7 +71,7 @@ function LandingPage() {
   const renderSection = (sectionId: string) => {
     switch (sectionId) {
       case 'hero': return <Hero onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
-      case 'scene': return <LiveNeighborhoodScene />;
+      case 'scene': return <><NeighborhoodStories /><LiveNeighborhoodScene /></>;
       case 'benefits': return <ThreeBenefits onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;
       case 'trust': return <TrustSection />;
       case 'businesses': return <BusinessSection onSelectRole={setSelectedRole} onScrollToForm={() => handleScrollToSection('registro')} />;

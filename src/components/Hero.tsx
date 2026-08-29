@@ -9,7 +9,6 @@ interface HeroProps {
 export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
   const { content } = useSiteContent();
   const hero = content.hero;
-  const previewImageUrl = hero.previewImageUrl === '/hero-app-preview.jpg' ? '/hero-phone-v2.png' : hero.previewImageUrl;
 
   const selectRole = (role: 'vecino' | 'comercio') => {
     onSelectRole(role);
@@ -49,7 +48,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
               <figcaption className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">{hero.previewLabel}</figcaption>
               <div className="pointer-events-none absolute -right-8 top-12 h-40 w-40 rounded-full bg-[#18B68B]/20 blur-3xl" />
               <div className="pointer-events-none absolute -bottom-6 -left-8 h-36 w-36 rounded-full bg-[#18B68B]/20 blur-3xl" />
-              <img src={previewImageUrl} alt={hero.previewImageAlt} className="relative z-10 mx-auto block max-h-[650px] w-auto max-w-full rounded-[2rem] object-contain shadow-2xl ring-1 ring-slate-900/10" />
+              <img src={hero.previewImageUrl} alt={hero.previewImageAlt} className="relative z-10 mx-auto block max-h-[650px] w-auto max-w-full rounded-[2.4rem] object-contain shadow-2xl ring-1 ring-slate-900/10" />
             </figure>
           </div>
         </div>
