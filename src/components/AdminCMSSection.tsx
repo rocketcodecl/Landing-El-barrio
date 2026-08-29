@@ -532,7 +532,7 @@ export function AdminCMSSection() {
           <div className="space-y-4">
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
               <div className="grid items-center gap-4 md:grid-cols-[150px_1fr]">
-                <img src={content.hero.previewImageUrl} alt={content.hero.previewImageAlt} className="mx-auto max-h-60 w-auto max-w-full rounded-2xl bg-white object-contain shadow-sm" />
+                <img src={content.hero.previewImageUrl === '/hero-app-preview.jpg' ? '/hero-phone-v2.png' : content.hero.previewImageUrl} alt={content.hero.previewImageAlt} className="mx-auto max-h-60 w-auto max-w-full rounded-2xl bg-white object-contain shadow-sm" />
                 <div className="space-y-3">
                   <div>
                     <h4 className="text-sm font-black text-slate-900">Imagen del celular en la portada</h4>
@@ -705,24 +705,6 @@ export function AdminCMSSection() {
               <Plus className="w-4 h-4" /> Agregar Publicación
             </button>
           </div>
-
-          <details className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4">
-            <summary className="cursor-pointer text-sm font-black text-slate-900">Fotos grandes de vida de barrio</summary>
-            <p className="mt-2 text-xs text-slate-600">Puedes subir imágenes en la pestaña “Imágenes” y pegar aquí sus URL.</p>
-            <div className="mt-4 grid gap-5 lg:grid-cols-2">
-              {([1, 2] as const).map((number) => {
-                const imageKey = `story${number}ImageUrl` as const;
-                const titleKey = `story${number}Title` as const;
-                const textKey = `story${number}Text` as const;
-                return <div key={number} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-                  <img src={content.scene[imageKey]} alt="" className="h-52 w-full rounded-xl object-cover" />
-                  <label className="block text-xs font-bold text-slate-700">URL de imagen<input value={content.scene[imageKey]} onChange={(event) => updateSection('scene', { [imageKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                  <label className="block text-xs font-bold text-slate-700">Título<input value={content.scene[titleKey]} onChange={(event) => updateSection('scene', { [titleKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                  <label className="block text-xs font-bold text-slate-700">Texto<textarea rows={3} value={content.scene[textKey]} onChange={(event) => updateSection('scene', { [textKey]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5 font-normal" /></label>
-                </div>;
-              })}
-            </div>
-          </details>
 
           {/* Quick Image Presets Palette */}
           <div className="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100 space-y-2">

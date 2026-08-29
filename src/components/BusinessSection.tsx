@@ -13,8 +13,10 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
   const featureIcons = [MapPin, Tag, MessageSquare, TrendingUp];
 
   return (
-    <section id="comercios" className="py-20 bg-emerald-950/5 border-b border-emerald-900/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="comercios" className="relative overflow-hidden py-20 bg-emerald-950/5 border-b border-emerald-900/10">
+      <img src="/background-barrio-comercio.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-[0.12]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#FAFDFB]/95 via-[#FAFDFB]/88 to-[#FAFDFB]/96" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">

@@ -61,6 +61,8 @@ export function TrustSection() {
 
   return (
     <section id="seguridad" className="py-20 bg-slate-900 text-white relative overflow-hidden">
+      <img src="/background-barrio-comunidad.jpg" alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+      <div className="absolute inset-0 bg-slate-950/70 pointer-events-none" />
       {/* Subtle Background Mesh */}
       <div className="absolute inset-0 bg-radial from-[#18B68B]/10 via-transparent to-transparent opacity-60 pointer-events-none" />
 
