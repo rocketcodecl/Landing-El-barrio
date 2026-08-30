@@ -33,8 +33,6 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
         
         <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
           
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#18B68B]/10 rounded-full blur-3xl pointer-events-none" />
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             
             <div className="lg:col-span-7 space-y-4">

@@ -40,9 +40,6 @@ export function FAQSection() {
 
   return (
     <section id="faq" className="relative overflow-hidden bg-[#F3F8F6] py-20 sm:py-24">
-      <div className="pointer-events-none absolute -right-32 top-10 h-80 w-80 rounded-full bg-[#18B68B]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-emerald-200/20 blur-3xl" />
-
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8">
         <div className="lg:col-span-4">
           <div className="space-y-6 lg:sticky lg:top-28">

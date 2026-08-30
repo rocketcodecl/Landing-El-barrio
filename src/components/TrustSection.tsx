@@ -60,9 +60,12 @@ export function TrustSection() {
   };
 
   return (
-    <section id="seguridad" className="py-20 bg-slate-900 text-white relative overflow-hidden">
-      {/* Subtle Background Mesh */}
-      <div className="absolute inset-0 bg-radial from-[#18B68B]/10 via-transparent to-transparent opacity-60 pointer-events-none" />
+    <section
+      id="seguridad"
+      className="relative overflow-hidden bg-slate-950 py-20 text-white"
+      style={{ backgroundImage: "url('/landing-media/barrio-comunidad.jpg')", backgroundPosition: 'center 48%', backgroundSize: 'cover' }}
+    >
+      <div className="pointer-events-none absolute inset-0 bg-slate-950/88" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

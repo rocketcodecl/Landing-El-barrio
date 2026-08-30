@@ -97,6 +97,8 @@ export interface HeroConfig {
   simulatorNeighborsCount: string;
   highlights: string[];
   previewLabel: string;
+  previewImageUrl: string;
+  previewImageAlt: string;
   verifiedLabel: string;
   tabFeed: string;
   tabMarket: string;

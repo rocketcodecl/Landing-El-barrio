@@ -65,10 +65,40 @@ export function AdminCMSSection() {
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
   const [fullEditorText, setFullEditorText] = useState(() => JSON.stringify(content, null, 2));
   const [fullEditorError, setFullEditorError] = useState<string | null>(null);
+  const [heroImageUploading, setHeroImageUploading] = useState(false);
+  const [heroImageMessage, setHeroImageMessage] = useState<string | null>(null);
 
   const notifySaved = () => {
     setSaveSuccessMsg(true);
     setTimeout(() => setSaveSuccessMsg(false), 2500);
+  };
+
+  const uploadHeroImage = async (file: File) => {
+    setHeroImageUploading(true);
+    setHeroImageMessage(null);
+    try {
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('No fue posible leer la imagen'));
+        reader.readAsDataURL(file);
+      });
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, mimeType: file.type, dataBase64 }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || 'No fue posible subir la imagen');
+      updateSection('hero', { previewImageUrl: body.url });
+      setHeroImageMessage('Imagen del hero actualizada.');
+      notifySaved();
+    } catch (error) {
+      setHeroImageMessage(error instanceof Error ? error.message : 'Error al subir');
+    } finally {
+      setHeroImageUploading(false);
+    }
   };
 
   const moveSection = (index: number, direction: -1 | 1) => {
@@ -495,11 +525,33 @@ export function AdminCMSSection() {
           <div className="border-b border-slate-100 pb-3">
             <h3 className="font-black text-lg text-slate-900">Sección Hero Principal</h3>
             <p className="text-xs text-slate-500">
-              Modifica los encabezados principales, llamadas a la acción, comunas y textos de la maqueta móvil.
+              Modifica los textos, botones y la imagen principal que muestra la aplicación.
             </p>
           </div>
 
           <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="grid gap-4 sm:grid-cols-[150px_1fr] sm:items-center">
+                <img src={content.hero.previewImageUrl} alt={content.hero.previewImageAlt} className="mx-auto h-56 w-auto max-w-full object-contain" />
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-700">Imagen principal de la app</label>
+                    <input type="text" value={content.hero.previewImageUrl} onChange={(e) => updateSection('hero', { previewImageUrl: e.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
+                  </div>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white hover:bg-slate-800">
+                    <Upload className="h-4 w-4" />
+                    {heroImageUploading ? 'Subiendo…' : 'Cambiar imagen'}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" disabled={heroImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadHeroImage(file); event.target.value = ''; }} className="hidden" />
+                  </label>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-700">Descripción accesible</label>
+                    <input type="text" value={content.hero.previewImageAlt} onChange={(e) => updateSection('hero', { previewImageAlt: e.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
+                  </div>
+                  {heroImageMessage && <p className="text-xs font-bold text-slate-600">{heroImageMessage}</p>}
+                </div>
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Badge Superior</label>
               <input
@@ -608,32 +660,9 @@ export function AdminCMSSection() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Simulador: Nombre del Sector</label>
-                <input
-                  type="text"
-                  value={content.hero.simulatorSector}
-                  onChange={(e) => {
-                    updateSection('hero', { simulatorSector: e.target.value });
-                    notifySaved();
-                  }}
-                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Simulador: Contador de Vecinos</label>
-                <input
-                  type="text"
-                  value={content.hero.simulatorNeighborsCount}
-                  onChange={(e) => {
-                    updateSection('hero', { simulatorNeighborsCount: e.target.value });
-                    notifySaved();
-                  }}
-                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]"
-                />
-              </div>
+            <div className="pt-2 border-t border-slate-100">
+              <label className="block text-xs font-bold text-slate-700 mb-1">Texto bajo la imagen</label>
+              <input type="text" value={content.hero.previewLabel} onChange={(e) => updateSection('hero', { previewLabel: e.target.value })} className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]" />
             </div>
           </div>
         </div>
