@@ -62,10 +62,10 @@ export function TrustSection() {
   return (
     <section
       id="seguridad"
-      className="relative overflow-hidden bg-slate-950 py-20 text-white"
+      className="relative overflow-hidden bg-white py-20 text-slate-950"
       style={{ backgroundImage: "url('/landing-media/barrio-comunidad.jpg')", backgroundPosition: 'center 48%', backgroundSize: 'cover' }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-slate-950/88" />
+      <div className="pointer-events-none absolute inset-0 bg-white/90" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
@@ -76,11 +76,11 @@ export function TrustSection() {
             <span>{badge}</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
             {title}
           </h2>
 
-          <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-700 text-base sm:text-lg leading-relaxed">
             {description}
           </p>
         </div>
@@ -90,15 +90,15 @@ export function TrustSection() {
           {pillars.map((pilar, idx) => (
             <div 
               key={idx}
-              className="bg-slate-800/80 p-6 rounded-2xl border border-slate-700/80 hover:border-[#18B68B]/60 transition-all group"
+              className="bg-white/90 p-6 rounded-2xl border border-slate-200 hover:border-[#18B68B]/60 transition-all group shadow-sm"
             >
-              <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-inner">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
                 {iconMap[idx] || <CheckCircle className="w-6 h-6 text-[#18B68B]" />}
               </div>
-              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#18B68B] transition-colors">
+              <h3 className="text-lg font-bold text-slate-950 mb-2 group-hover:text-[#0E8067] transition-colors">
                 {pilar.title}
               </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 {pilar.description}
               </p>
             </div>
@@ -106,11 +106,11 @@ export function TrustSection() {
         </div>
 
         {/* Transparency Commitment Note */}
-        <div className="mt-14 max-w-4xl mx-auto bg-slate-800/50 rounded-2xl p-6 border border-slate-700 text-center space-y-2">
-          <p className="text-xs text-slate-400 uppercase tracking-widest font-semibold">
+        <div className="mt-14 max-w-4xl mx-auto bg-white/85 rounded-2xl p-6 border border-slate-200 text-center space-y-2 shadow-sm">
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">
             {trust.transparencyTitle || 'Compromiso de Transparencia'}
           </p>
-          <p className="text-xs sm:text-sm text-slate-300">
+          <p className="text-xs sm:text-sm text-slate-600">
             {commitmentText}
           </p>
         </div>

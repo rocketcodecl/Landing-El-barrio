@@ -99,6 +99,8 @@ export interface HeroConfig {
   previewLabel: string;
   previewImageUrl: string;
   previewImageAlt: string;
+  backgroundVideoUrl: string;
+  backgroundPosterUrl: string;
   verifiedLabel: string;
   tabFeed: string;
   tabMarket: string;
