@@ -13,11 +13,10 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
 
   return (
     <section className="relative isolate min-h-[600px] overflow-hidden bg-[#F8FBFA] text-slate-950 lg:min-h-[640px]">
-      <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata" poster={hero.backgroundPosterUrl} aria-hidden="true">
+      <video className="absolute inset-0 h-full w-full object-cover brightness-[0.92] saturate-[0.9]" autoPlay muted loop playsInline preload="auto" poster={hero.backgroundPosterUrl} aria-hidden="true">
         <source src={hero.backgroundVideoUrl} type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-white/78" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.94)_45%,rgba(255,255,255,0.78)_70%,rgba(255,255,255,0.7)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.94)_0%,rgba(255,255,255,0.86)_43%,rgba(255,255,255,0.52)_68%,rgba(255,255,255,0.26)_100%)]" />
 
       <div className="relative mx-auto grid min-h-[600px] max-w-7xl grid-cols-1 items-center gap-6 px-5 py-12 sm:px-8 lg:min-h-[640px] lg:grid-cols-12 lg:gap-10 lg:px-8 lg:py-14">
         <div className="space-y-6 lg:col-span-7">
