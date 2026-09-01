@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowUpRight, ChevronDown, HelpCircle, Mail, ShieldCheck, Store } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, HelpCircle, MessageCircle, ShieldCheck, Store } from 'lucide-react';
 import { FAQCategory } from '../types';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -8,7 +8,9 @@ type CategoryFilter = FAQCategory | 'all';
 export function FAQSection() {
   const { content } = useSiteContent();
   const faqs = content.faqs || [];
-  const supportEmail = content.branding?.supportEmail || 'contacto@elbarrio.lat';
+  const configuredWhatsapp = (content.branding?.supportWhatsapp || '+56935304705').replace(/[^0-9]/g, '');
+  const supportWhatsapp = configuredWhatsapp === '56912345678' ? '56935304705' : configuredWhatsapp;
+  const whatsappMessage = encodeURIComponent('Hola, tengo una consulta sobre El Barrio.');
   const section = content.faqSection;
   const categoryLabels: Record<FAQCategory, string> = {
     general: section.generalLabel,
@@ -63,11 +65,13 @@ export function FAQSection() {
                 {section.contactText}
               </p>
               <a
-                href={`mailto:${supportEmail}`}
-                className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-[#0E8067] transition-colors hover:text-emerald-950"
+                href={`https://wa.me/${supportWhatsapp}?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#18B68B] px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-[#0E8067]"
               >
-                <Mail className="h-4 w-4" aria-hidden="true" />
-                {supportEmail}
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Escríbenos por WhatsApp
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>

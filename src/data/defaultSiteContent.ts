@@ -68,7 +68,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     customIsotypeUrl: '',
     primaryColor: '#18B68B',
     supportEmail: 'contacto@elbarrio.lat',
-    supportWhatsapp: '+56912345678',
+    supportWhatsapp: '+56935304705',
     officialDomain: 'https://elbarrio.lat',
   },
   hero: {
