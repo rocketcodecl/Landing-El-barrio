@@ -68,7 +68,7 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
             <div className="lg:col-span-5 flex flex-col items-stretch sm:items-end justify-center">
               <div className="w-full max-w-sm space-y-2 flex flex-col items-stretch">
                 <button
-                  onClick={() => { onSelectRole('comercio'); onScrollToForm(); }}
+                  onClick={() => window.location.assign('https://negocios.elbarrio.lat/')}
                   className="w-full bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm cursor-pointer text-center"
                 >
                   {buttonText}

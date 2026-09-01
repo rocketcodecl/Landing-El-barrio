@@ -71,8 +71,8 @@ export function TrustSection() {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18B68B]/20 text-[#18B68B] text-xs font-bold uppercase tracking-wider border border-[#18B68B]/30">
-            <ShieldCheck className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18B68B] text-white text-xs font-bold uppercase tracking-wider border border-[#18B68B]">
+            <ShieldCheck className="w-4 h-4 text-white" />
             <span>{badge}</span>
           </div>
 

@@ -151,7 +151,7 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
             </button>
 
             <button
-              onClick={() => handleRoleClick('comercio')}
+              onClick={() => window.location.assign('https://negocios.elbarrio.lat/')}
               className="w-full bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2"
             >
               <Store className="w-4 h-4 text-[#18B68B]" />

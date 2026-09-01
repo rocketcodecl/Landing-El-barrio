@@ -293,7 +293,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
 
                   <div className={comuna === 'Otra comuna' ? 'sm:col-span-1' : 'sm:col-span-2'}>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                      {ui.communeLabel} <span className="text-red-500">*</span>
+                      Comuna <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={comuna}

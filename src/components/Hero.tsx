@@ -9,7 +9,8 @@ interface HeroProps {
 export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
   const { content } = useSiteContent();
   const hero = content.hero;
-  const selectRole = (role: 'vecino' | 'comercio') => { onSelectRole(role); onScrollToForm(); };
+  const selectNeighbor = () => { onSelectRole('vecino'); onScrollToForm(); };
+  const openBusinessPortal = () => window.location.assign('https://negocios.elbarrio.lat/');
 
   return (
     <section className="relative isolate min-h-[600px] overflow-hidden bg-[#F8FBFA] text-slate-950 lg:min-h-[640px]">
@@ -36,10 +37,10 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
           </p>
 
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <button onClick={() => selectRole('vecino')} className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#18B68B] px-7 py-4 text-base font-extrabold text-white shadow-xl shadow-black/15 transition-colors hover:bg-[#20C99A]">
+            <button onClick={selectNeighbor} className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#18B68B] px-7 py-4 text-base font-extrabold text-white shadow-xl shadow-black/15 transition-colors hover:bg-[#20C99A]">
               {hero.ctaVecino}<ArrowRight className="h-5 w-5" />
             </button>
-            <button onClick={() => selectRole('comercio')} className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 bg-white px-6 py-4 text-base font-extrabold text-slate-950 shadow-sm transition-colors hover:border-[#18B68B] hover:bg-emerald-50">
+            <button onClick={openBusinessPortal} className="inline-flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 bg-white px-6 py-4 text-base font-extrabold text-slate-950 shadow-sm transition-colors hover:border-[#18B68B] hover:bg-emerald-50">
               <Store className="h-5 w-5" />{hero.ctaComercio}
             </button>
           </div>
@@ -51,8 +52,7 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
 
         <div className="hidden items-center justify-center lg:col-span-5 lg:flex">
           <figure className="relative w-full max-w-[330px]">
-            <img src={hero.previewImageUrl} alt={hero.previewImageAlt} className="block max-h-[545px] w-full object-contain drop-shadow-[0_24px_38px_rgba(15,23,42,0.18)]" loading="eager" fetchPriority="high" />
-            {hero.previewLabel && <figcaption className="mt-2 text-center text-xs font-bold text-slate-600">{hero.previewLabel}</figcaption>}
+            <img src={hero.previewImageUrl} alt={hero.previewImageAlt} className="block max-h-[545px] w-full object-contain" loading="eager" fetchPriority="high" />
           </figure>
         </div>
       </div>

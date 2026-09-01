@@ -283,7 +283,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     emailPlaceholder: 'tu@correo.cl',
     phoneLabel: 'WhatsApp / Celular',
     phonePlaceholder: '+56 9 1234 5678',
-    communeLabel: 'Comuna en Chile',
+    communeLabel: 'Comuna',
     otherCommuneLabel: 'Especifica tu comuna',
     otherCommunePlaceholder: 'Nombre de tu comuna',
     submittingText: 'Registrando tu cupo...',
