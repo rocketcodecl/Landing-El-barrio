@@ -69,8 +69,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
           </div>
 
           <div className="lg:col-span-6">
-            <div className="bg-gradient-to-br from-emerald-50 to-white p-6 sm:p-8 rounded-3xl border border-emerald-900/10 shadow-lg relative">
-              <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
+            <div className="relative flex h-full min-h-[260px] items-center rounded-3xl border border-emerald-900/10 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+              <div className="w-full bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#18B68B] text-white flex items-center justify-center font-bold text-sm">
@@ -143,8 +143,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
           </div>
 
           <div className="lg:col-span-6 lg:order-1">
-            <div className="bg-gradient-to-br from-purple-50 to-white p-6 sm:p-8 rounded-3xl border border-purple-900/10 shadow-lg">
-              <div className="space-y-3">
+            <div className="flex h-full min-h-[260px] items-center rounded-3xl border border-purple-900/10 bg-gradient-to-br from-purple-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+              <div className="w-full space-y-3">
                 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -231,8 +231,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
           </div>
 
           <div className="lg:col-span-6">
-            <div className="bg-gradient-to-br from-red-50 to-white p-6 sm:p-8 rounded-3xl border border-red-900/10 shadow-lg">
-              <div className="bg-white p-5 rounded-2xl border border-red-200 shadow-sm space-y-3">
+            <div className="flex h-full min-h-[260px] items-center rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+              <div className="w-full bg-white p-5 rounded-2xl border border-red-200 shadow-sm space-y-3">
                 <div className="flex items-center justify-between text-xs font-bold text-red-700 border-b border-red-100 pb-2">
                   <span className="flex items-center gap-1.5">
                     <ShieldAlert className="w-4 h-4" /> Alerta de Cuadrante Activa
