@@ -31,8 +31,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
         </div>
 
         {/* Benefit 1: CONECTA */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
-          <div className="lg:col-span-6 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch mb-24">
+          <div className="lg:col-span-6 flex flex-col justify-center space-y-6">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-[#18B68B] flex items-center justify-center font-bold">
               <Users className="w-6 h-6" />
             </div>
@@ -68,8 +68,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
             </button>
           </div>
 
-          <div className="lg:col-span-6">
-            <div className="relative flex h-full min-h-[260px] items-center rounded-3xl border border-emerald-900/10 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+          <div className="lg:col-span-6 flex">
+            <div className="relative flex min-h-[300px] w-full flex-1 items-center rounded-3xl border border-emerald-900/10 bg-gradient-to-br from-emerald-50 to-white p-6 shadow-lg sm:p-8 lg:min-h-[360px]">
               <div className="w-full bg-white p-5 rounded-2xl shadow-md border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-3">
@@ -105,8 +105,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
         </div>
 
         {/* Benefit 2: RESUELVE */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24 lg:flex-row-reverse">
-          <div className="lg:col-span-6 lg:order-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch mb-24 lg:flex-row-reverse">
+          <div className="lg:col-span-6 lg:order-2 flex flex-col justify-center space-y-6">
             <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
               <ShoppingBag className="w-6 h-6" />
             </div>
@@ -142,8 +142,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
             </button>
           </div>
 
-          <div className="lg:col-span-6 lg:order-1">
-            <div className="flex h-full min-h-[260px] items-center rounded-3xl border border-purple-900/10 bg-gradient-to-br from-purple-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+          <div className="lg:col-span-6 lg:order-1 flex">
+            <div className="flex min-h-[300px] w-full flex-1 items-center rounded-3xl border border-purple-900/10 bg-gradient-to-br from-purple-50 to-white p-6 shadow-lg sm:p-8 lg:min-h-[360px]">
               <div className="w-full space-y-3">
                 
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
@@ -193,8 +193,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
         </div>
 
         {/* Benefit 3: CUIDA */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+          <div className="lg:col-span-6 flex flex-col justify-center space-y-6">
             <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
               <ShieldAlert className="w-6 h-6" />
             </div>
@@ -230,8 +230,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
             </button>
           </div>
 
-          <div className="lg:col-span-6">
-            <div className="flex h-full min-h-[260px] items-center rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-50 to-white p-6 shadow-lg sm:min-h-[290px] sm:p-8">
+          <div className="lg:col-span-6 flex">
+            <div className="flex min-h-[300px] w-full flex-1 items-center rounded-3xl border border-red-900/10 bg-gradient-to-br from-red-50 to-white p-6 shadow-lg sm:p-8 lg:min-h-[360px]">
               <div className="w-full bg-white p-5 rounded-2xl border border-red-200 shadow-sm space-y-3">
                 <div className="flex items-center justify-between text-xs font-bold text-red-700 border-b border-red-100 pb-2">
                   <span className="flex items-center gap-1.5">
