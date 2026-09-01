@@ -36,8 +36,8 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             
             <div className="lg:col-span-7 space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18B68B]/20 text-[#18B68B] text-xs font-bold uppercase tracking-wider border border-[#18B68B]/30">
-                <Target className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#18B68B] text-white text-xs font-bold uppercase tracking-wider border border-[#18B68B]">
+                <Target className="w-3.5 h-3.5 text-white" />
                 <span>{badge}</span>
               </div>
 
@@ -49,16 +49,16 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
                 {description}
               </p>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs font-semibold text-emerald-200">
-                <div className="flex items-center gap-2 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
+              <div className="flex flex-nowrap gap-3 overflow-x-auto pt-2 text-xs font-semibold text-emerald-200">
+                <div className="flex shrink-0 items-center gap-2 whitespace-nowrap bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
                   <Sparkles className="w-4 h-4 text-[#18B68B]" />
                   <span>{bullet1}</span>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
+                <div className="flex shrink-0 items-center gap-2 whitespace-nowrap bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
                   <Eye className="w-4 h-4 text-[#18B68B]" />
                   <span>{bullet2}</span>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
+                <div className="flex shrink-0 items-center gap-2 whitespace-nowrap bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/80">
                   <MapPin className="w-4 h-4 text-[#18B68B]" />
                   <span>{bullet3}</span>
                 </div>

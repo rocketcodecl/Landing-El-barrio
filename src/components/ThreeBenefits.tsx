@@ -18,11 +18,11 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+        <div className="text-center max-w-6xl mx-auto mb-16 space-y-3">
           <span className="text-xs font-bold uppercase tracking-wider text-[#18B68B] bg-emerald-50 px-3 py-1 rounded-full">
             {benefits.badge || 'Pilares Fundamentales'}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight lg:whitespace-nowrap">
             {benefits.title || 'Tres grandes beneficios en una sola aplicación'}
           </h2>
           <p className="text-slate-600 text-base sm:text-lg">

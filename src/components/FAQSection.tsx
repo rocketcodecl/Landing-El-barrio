@@ -108,7 +108,7 @@ export function FAQSection() {
             })}
           </div>
 
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.45)]">
+          <div key={activeCategory} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-42px_rgba(15,23,42,0.45)] animate-in fade-in duration-300">
             {filteredItems.map((item, index) => {
               const isOpen = openId === item.id;
               const panelId = `faq-panel-${item.id}`;
@@ -148,13 +148,20 @@ export function FAQSection() {
                     </button>
                   </h3>
 
-                  {isOpen && (
-                    <div id={panelId} role="region" className="px-5 pb-6 pl-[4.25rem] sm:px-7 sm:pb-7 sm:pl-[5rem]">
-                      <p className="max-w-2xl border-l-2 border-emerald-200 pl-4 text-sm leading-7 text-slate-600 sm:text-base">
-                        {item.answer}
-                      </p>
+                  <div
+                    id={panelId}
+                    role="region"
+                    aria-hidden={!isOpen}
+                    className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-5 pb-6 pl-[4.25rem] sm:px-7 sm:pb-7 sm:pl-[5rem]">
+                        <p className="max-w-2xl border-l-2 border-emerald-200 pl-4 text-sm leading-7 text-slate-600 sm:text-base">
+                          {item.answer}
+                        </p>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </article>
               );
             })}
