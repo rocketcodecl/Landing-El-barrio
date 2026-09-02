@@ -50,11 +50,6 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
           </div>
         </div>
 
-        <div className="hidden items-center justify-center lg:col-span-5 lg:flex">
-          <figure className="relative w-full max-w-[330px]">
-            <img src={hero.previewImageUrl} alt={hero.previewImageAlt} className="block max-h-[545px] w-full object-contain" loading="eager" fetchPriority="high" />
-          </figure>
-        </div>
       </div>
     </section>
   );
