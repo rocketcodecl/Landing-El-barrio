@@ -26,9 +26,9 @@ export function Hero({ onSelectRole, onScrollToForm }: HeroProps) {
             <span>{hero.badge}</span>
           </div>
 
-          <h1 className="max-w-3xl text-4xl font-black leading-[1.03] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-6xl">
+          <h1 className="max-w-3xl text-4xl font-light leading-[1.03] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-6xl">
             {hero.titlePart1}{' '}
-            <span className="text-[#0E8067]">{hero.titleHighlight}</span>
+            <span className="font-black text-[#0E8067]">{hero.titleHighlight}</span>
             {hero.titlePart2}
           </h1>
 
