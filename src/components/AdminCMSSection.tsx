@@ -6,6 +6,7 @@ import { AdminMediaLibrary } from './AdminMediaLibrary';
 import {
   Palette,
   Sparkles,
+  Heart,
   MessageSquare,
   ShieldCheck,
   Store,
@@ -54,7 +55,7 @@ export function AdminCMSSection() {
   } = useSiteContent();
 
   const [activeSubTab, setActiveSubTab] = useState<
-    'design' | 'seo' | 'media' | 'layout' | 'all' | 'branding' | 'hero' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
+    'design' | 'seo' | 'media' | 'layout' | 'all' | 'branding' | 'hero' | 'story' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
   >('design');
 
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
@@ -67,6 +68,8 @@ export function AdminCMSSection() {
   const [fullEditorError, setFullEditorError] = useState<string | null>(null);
   const [heroImageUploading, setHeroImageUploading] = useState(false);
   const [heroImageMessage, setHeroImageMessage] = useState<string | null>(null);
+  const [storyImageUploading, setStoryImageUploading] = useState(false);
+  const [storyImageMessage, setStoryImageMessage] = useState<string | null>(null);
 
   const notifySaved = () => {
     setSaveSuccessMsg(true);
@@ -98,6 +101,34 @@ export function AdminCMSSection() {
       setHeroImageMessage(error instanceof Error ? error.message : 'Error al subir');
     } finally {
       setHeroImageUploading(false);
+    }
+  };
+
+  const uploadStoryImage = async (file: File, target: 'mediaUrl' | 'mediaPosterUrl') => {
+    setStoryImageUploading(true);
+    setStoryImageMessage(null);
+    try {
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('No fue posible leer la imagen'));
+        reader.readAsDataURL(file);
+      });
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, mimeType: file.type, dataBase64 }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || 'No fue posible subir la imagen');
+      updateSection('story', target === 'mediaUrl' ? { mediaType: 'image', mediaUrl: body.url } : { mediaPosterUrl: body.url });
+      setStoryImageMessage(target === 'mediaUrl' ? 'Imagen principal actualizada.' : 'Portada del video actualizada.');
+      notifySaved();
+    } catch (error) {
+      setStoryImageMessage(error instanceof Error ? error.message : 'Error al subir');
+    } finally {
+      setStoryImageUploading(false);
     }
   };
 
@@ -263,6 +294,7 @@ export function AdminCMSSection() {
           { id: 'all', label: 'Control Total', icon: Code2 },
           { id: 'branding', label: 'Marca & Logos', icon: Palette },
           { id: 'hero', label: 'Hero Principal', icon: Sparkles },
+          { id: 'story', label: 'Corazón de El Barrio', icon: Heart },
           { id: 'posts', label: 'Feed ("Así se vive")', icon: MessageSquare },
           { id: 'benefits', label: '3 Beneficios', icon: Layers },
           { id: 'trust', label: 'Seguridad', icon: ShieldCheck },
@@ -663,6 +695,103 @@ export function AdminCMSSection() {
             <div className="pt-2 border-t border-slate-100">
               <label className="block text-xs font-bold text-slate-700 mb-1">Texto bajo la imagen</label>
               <input type="text" value={content.hero.previewLabel} onChange={(e) => updateSection('hero', { previewLabel: e.target.value })} className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeSubTab === 'story' && (
+        <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 className="text-lg font-black text-slate-900">Corazón de El Barrio</h3>
+              <p className="mt-1 text-xs leading-relaxed text-slate-500">Edita el relato central y elige libremente una fotografía o un video para acompañarlo.</p>
+            </div>
+            <label className="flex items-center gap-2 text-xs font-bold text-slate-700">
+              <input type="checkbox" checked={content.story.visible} onChange={(event) => updateSection('story', { visible: event.target.checked })} className="h-4 w-4 accent-[#18B68B]" />
+              Mostrar bloque
+            </label>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[minmax(240px,0.8fr)_minmax(0,1.2fr)]">
+            <div className="space-y-4">
+              <div className="relative h-80 overflow-hidden rounded-2xl bg-slate-100">
+                {content.story.mediaType === 'video' && content.story.mediaUrl ? (
+                  <video src={content.story.mediaUrl} poster={content.story.mediaPosterUrl || undefined} className="h-full w-full object-cover" controls muted preload="metadata" />
+                ) : (
+                  <img src={content.story.mediaUrl || content.story.mediaPosterUrl} alt={content.story.mediaAlt} className="h-full w-full object-cover" />
+                )}
+              </div>
+
+              <label className="block text-xs font-bold text-slate-700">Tipo de recurso
+                <select value={content.story.mediaType} onChange={(event) => updateSection('story', { mediaType: event.target.value as 'image' | 'video' })} className="mt-1 w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs">
+                  <option value="image">Fotografía</option>
+                  <option value="video">Video</option>
+                </select>
+              </label>
+
+              <label className="block text-xs font-bold text-slate-700">
+                {content.story.mediaType === 'video' ? 'URL del video (MP4 o WebM)' : 'URL de la fotografía'}
+                <input type="text" value={content.story.mediaUrl} onChange={(event) => updateSection('story', { mediaUrl: event.target.value })} placeholder={content.story.mediaType === 'video' ? '/ruta/video.mp4' : '/ruta/imagen.webp'} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+              </label>
+
+              {content.story.mediaType === 'image' ? (
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white hover:bg-slate-800">
+                  <Upload className="h-4 w-4" />
+                  {storyImageUploading ? 'Subiendo…' : 'Subir fotografía'}
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={storyImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadStoryImage(file, 'mediaUrl'); event.target.value = ''; }} className="hidden" />
+                </label>
+              ) : (
+                <p className="rounded-xl border border-blue-100 bg-blue-50 p-3 text-xs leading-relaxed text-blue-800">El video debe estar publicado en una URL MP4 o WebM. Se reproduce automáticamente, sin sonido y en bucle.</p>
+              )}
+
+              {content.story.mediaType === 'video' && (
+                <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <label className="block text-xs font-bold text-slate-700">Imagen de portada y respaldo
+                    <input type="text" value={content.story.mediaPosterUrl} onChange={(event) => updateSection('story', { mediaPosterUrl: event.target.value })} placeholder="/ruta/portada.webp" className="mt-1 w-full rounded-xl border border-slate-300 bg-white p-2.5 text-xs font-normal" />
+                  </label>
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800 hover:border-[#18B68B]">
+                    <Upload className="h-4 w-4" />
+                    {storyImageUploading ? 'Subiendo…' : 'Subir portada'}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={storyImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadStoryImage(file, 'mediaPosterUrl'); event.target.value = ''; }} className="hidden" />
+                  </label>
+                </div>
+              )}
+
+              <label className="block text-xs font-bold text-slate-700">Descripción accesible
+                <input type="text" value={content.story.mediaAlt} onChange={(event) => updateSection('story', { mediaAlt: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+              </label>
+              <label className="block text-xs font-bold text-slate-700">Leyenda sobre el recurso
+                <input type="text" value={content.story.mediaCaption} onChange={(event) => updateSection('story', { mediaCaption: event.target.value })} placeholder="Déjalo vacío para ocultarla" className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+              </label>
+              {storyImageMessage && <p className="text-xs font-bold text-slate-600">{storyImageMessage}</p>}
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-xs font-bold text-slate-700">Etiqueta superior
+                <input type="text" value={content.story.eyebrow} onChange={(event) => updateSection('story', { eyebrow: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+              </label>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block text-xs font-bold text-slate-700">Título en light
+                  <input type="text" value={content.story.titlePart1} onChange={(event) => updateSection('story', { titlePart1: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-light" />
+                </label>
+                <label className="block text-xs font-bold text-slate-700">Título destacado en bold
+                  <input type="text" value={content.story.titleHighlight} onChange={(event) => updateSection('story', { titleHighlight: event.target.value })} className="mt-1 w-full rounded-xl border border-[#18B68B] bg-emerald-50/50 p-2.5 text-xs font-black text-[#18B68B]" />
+                </label>
+              </div>
+              {[
+                ['paragraph1', 'Párrafo 1'],
+                ['paragraph2', 'Párrafo 2'],
+                ['paragraph3', 'Párrafo 3'],
+              ].map(([key, label]) => (
+                <label key={key} className="block text-xs font-bold text-slate-700">{label}
+                  <textarea rows={4} value={content.story[key as 'paragraph1' | 'paragraph2' | 'paragraph3']} onChange={(event) => updateSection('story', { [key]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal leading-relaxed" />
+                </label>
+              ))}
+              <label className="block text-xs font-bold text-slate-700">Frase final destacada
+                <textarea rows={3} value={content.story.closingText} onChange={(event) => updateSection('story', { closingText: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold leading-relaxed" />
+              </label>
+              <p className="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-xs leading-relaxed text-emerald-900">Los cambios se guardan automáticamente y se reflejan en la landing pública.</p>
             </div>
           </div>
         </div>

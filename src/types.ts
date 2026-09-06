@@ -108,6 +108,22 @@ export interface HeroConfig {
   tabAlerts: string;
 }
 
+export interface StoryConfig {
+  visible: boolean;
+  eyebrow: string;
+  titlePart1: string;
+  titleHighlight: string;
+  paragraph1: string;
+  paragraph2: string;
+  paragraph3: string;
+  closingText: string;
+  mediaType: 'image' | 'video';
+  mediaUrl: string;
+  mediaPosterUrl: string;
+  mediaAlt: string;
+  mediaCaption: string;
+}
+
 export interface BenefitItemConfig {
   tag: string;
   title: string;
@@ -358,6 +374,7 @@ export interface SiteContent {
   navigation: NavigationConfig;
   branding: BrandingConfig;
   hero: HeroConfig;
+  story: StoryConfig;
   scene: SceneConfig;
   posts: NeighborhoodPost[];
   benefits: BenefitsConfig;
