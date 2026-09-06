@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { NeighborhoodStory } from './components/NeighborhoodStory';
 import { LiveNeighborhoodScene } from './components/LiveNeighborhoodScene';
 import { ThreeBenefits } from './components/ThreeBenefits';
 import { TrustSection } from './components/TrustSection';
@@ -102,7 +103,10 @@ function LandingPage() {
 
         <main className="flex-1">
           {content.layout.sections.filter((section) => section.visible).map((section) => (
-            <Fragment key={section.id}>{renderSection(section.id)}</Fragment>
+            <Fragment key={section.id}>
+              {renderSection(section.id)}
+              {section.id === 'hero' && <NeighborhoodStory />}
+            </Fragment>
           ))}
         </main>
 
