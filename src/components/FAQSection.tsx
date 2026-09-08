@@ -71,7 +71,7 @@ export function FAQSection() {
                 className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#18B68B] px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-[#0E8067]"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                Escríbenos por WhatsApp
+                {section.contactButton}
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </div>

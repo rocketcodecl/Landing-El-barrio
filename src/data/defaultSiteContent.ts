@@ -228,6 +228,9 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     title: 'Haz que tu negocio o servicio llegue a quienes',
     titleHighlight: 'realmente viven cerca',
     subtitle: 'Conecta con clientes reales de tu mismo sector mediante presencia local relevante y contacto directo.',
+    imageUrl: '/landing-media/comercio-local.jpg',
+    imageAlt: 'Comercio local de barrio',
+    imageCaption: 'Tu negocio, visible para quienes viven cerca.',
     features: [
       { title: 'Segmentación Real', description: 'Llega a vecinos dentro de cuadrantes concretos, sin desperdiciar alcance.' },
       { title: 'Publica Promociones', description: 'Comparte beneficios, novedades y ofertas para tu comunidad cercana.' },
@@ -247,7 +250,10 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     ctaButton: 'Consultar opciones de visibilidad',
     bullet1: 'Banners destacados en feed',
     bullet2: 'Posts patrocinados geolocalizados',
-    bullet3: 'Filtro por cuadrante exacto'
+    bullet3: 'Filtro por cuadrante exacto',
+    imageUrl: '/landing-media/comercio-local.jpg',
+    imageAlt: 'Comercio local atendiendo a personas del barrio',
+    note: 'Espacios limitados por cuadrante para proteger la experiencia vecinal.'
   },
   faqs: FAQ_ITEMS,
   faqSection: {

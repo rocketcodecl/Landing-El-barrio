@@ -12,7 +12,7 @@ export function Footer() {
   const footer = content.footer || {};
 
   const domain = branding.officialDomain || (branding as any).domain || 'https://elbarrio.lat';
-  const supportEmail = branding.supportEmail || (branding as any).contactEmail || 'contacto@elbarrio.lat';
+  const supportEmail = footer.supportEmail || branding.supportEmail || (branding as any).contactEmail || 'contacto@elbarrio.lat';
   const description = footer.description || 'La super-app hiperlocal para conectar con tus vecinos de a pie, comprar, vender, regalar, arrendar herramientas y enterarte de la vida de tu entorno.';
   const locationNotice = footer.locationNotice || (footer as any).cityNote || 'Santiago, Chile • Proyecto en proceso de activación comunitaria en Las Condes.';
   const copyrightText = footer.copyrightText || 'El Barrio (elbarrio.lat). Todos los derechos reservados.';

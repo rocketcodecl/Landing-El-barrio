@@ -56,7 +56,7 @@ export function AdminCMSSection() {
 
   const [activeSubTab, setActiveSubTab] = useState<
     'design' | 'seo' | 'media' | 'layout' | 'all' | 'branding' | 'hero' | 'story' | 'posts' | 'benefits' | 'trust' | 'businesses' | 'localAds' | 'faqs' | 'waitlistForm' | 'footer'
-  >('design');
+  >('hero');
 
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
@@ -70,6 +70,8 @@ export function AdminCMSSection() {
   const [heroImageMessage, setHeroImageMessage] = useState<string | null>(null);
   const [storyImageUploading, setStoryImageUploading] = useState(false);
   const [storyImageMessage, setStoryImageMessage] = useState<string | null>(null);
+  const [sectionImageUploading, setSectionImageUploading] = useState(false);
+  const [sectionImageMessage, setSectionImageMessage] = useState<string | null>(null);
 
   const notifySaved = () => {
     setSaveSuccessMsg(true);
@@ -94,8 +96,8 @@ export function AdminCMSSection() {
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.error || 'No fue posible subir la imagen');
-      updateSection('hero', { previewImageUrl: body.url });
-      setHeroImageMessage('Imagen del hero actualizada.');
+      updateSection('hero', { backgroundPosterUrl: body.url });
+      setHeroImageMessage('Portada del video actualizada.');
       notifySaved();
     } catch (error) {
       setHeroImageMessage(error instanceof Error ? error.message : 'Error al subir');
@@ -129,6 +131,34 @@ export function AdminCMSSection() {
       setStoryImageMessage(error instanceof Error ? error.message : 'Error al subir');
     } finally {
       setStoryImageUploading(false);
+    }
+  };
+
+  const uploadSectionImage = async (file: File, onUploaded: (url: string) => void, successMessage: string) => {
+    setSectionImageUploading(true);
+    setSectionImageMessage(null);
+    try {
+      const dataBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('No fue posible leer la imagen'));
+        reader.readAsDataURL(file);
+      });
+      const response = await fetch('/api/media', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, mimeType: file.type, dataBase64 }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || 'No fue posible subir la imagen');
+      onUploaded(body.url);
+      setSectionImageMessage(successMessage);
+      notifySaved();
+    } catch (error) {
+      setSectionImageMessage(error instanceof Error ? error.message : 'Error al subir');
+    } finally {
+      setSectionImageUploading(false);
     }
   };
 
@@ -284,46 +314,59 @@ export function AdminCMSSection() {
         </div>
       </div>
 
-      {/* Sub Tabs Bar */}
-      <div className="flex flex-wrap gap-2 p-1.5 bg-slate-200/80 rounded-2xl border border-slate-300">
+      {/* Section tabs follow the same order as the public landing. */}
+      <div className="space-y-3 rounded-2xl border border-slate-300 bg-slate-200/80 p-3">
         {[
-          { id: 'design', label: 'Diseño Global', icon: Palette },
-          { id: 'seo', label: 'SEO & Compartir', icon: ExternalLink },
-          { id: 'media', label: 'Imágenes', icon: Image },
-          { id: 'layout', label: 'Estructura & Orden', icon: Settings2 },
-          { id: 'all', label: 'Control Total', icon: Code2 },
-          { id: 'branding', label: 'Marca & Logos', icon: Palette },
-          { id: 'hero', label: 'Hero Principal', icon: Sparkles },
-          { id: 'story', label: 'Corazón de El Barrio', icon: Heart },
-          { id: 'posts', label: 'Feed ("Así se vive")', icon: MessageSquare },
-          { id: 'benefits', label: '3 Beneficios', icon: Layers },
-          { id: 'trust', label: 'Seguridad', icon: ShieldCheck },
-          { id: 'businesses', label: 'Comercios', icon: Store },
-          { id: 'localAds', label: 'Publicidad Local', icon: Eye },
-          { id: 'faqs', label: 'Preguntas (FAQ)', icon: HelpCircle },
-          { id: 'waitlistForm', label: 'Formulario', icon: FileText },
-          { id: 'footer', label: 'Footer & Pie', icon: GlobeIcon },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeSubTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveSubTab(tab.id as any);
-                if (tab.id === 'all') setFullEditorText(JSON.stringify(content, null, 2));
-              }}
-              className={`text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-white text-[#18B68B] shadow-sm'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+          {
+            label: 'Secciones de la landing',
+            tabs: [
+              { id: 'hero', label: '1. Hero Principal', icon: Sparkles },
+              { id: 'story', label: '2. Corazón de El Barrio', icon: Heart },
+              { id: 'posts', label: '3. Así se vive', icon: MessageSquare },
+              { id: 'benefits', label: '4. Beneficios', icon: Layers },
+              { id: 'trust', label: '5. Seguridad', icon: ShieldCheck },
+              { id: 'businesses', label: '6. Negocios y Servicios', icon: Store },
+              { id: 'localAds', label: '7. Publicidad Local', icon: Eye },
+              { id: 'faqs', label: '8. Preguntas Frecuentes', icon: HelpCircle },
+              { id: 'waitlistForm', label: '9. Formulario', icon: FileText },
+              { id: 'footer', label: '10. Footer', icon: GlobeIcon },
+            ],
+          },
+          {
+            label: 'Configuración general',
+            tabs: [
+              { id: 'branding', label: 'Marca y logos', icon: Palette },
+              { id: 'design', label: 'Diseño global', icon: Palette },
+              { id: 'layout', label: 'Visibilidad y orden', icon: Settings2 },
+              { id: 'media', label: 'Biblioteca de imágenes', icon: Image },
+              { id: 'seo', label: 'SEO y compartir', icon: ExternalLink },
+              { id: 'all', label: 'Avanzado / JSON', icon: Code2 },
+            ],
+          },
+        ].map((group) => (
+          <div key={group.label} className="space-y-2">
+            <p className="px-1 text-[10px] font-black uppercase tracking-[0.14em] text-slate-500">{group.label}</p>
+            <div className="flex flex-wrap gap-2">
+              {group.tabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeSubTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveSubTab(tab.id as typeof activeSubTab);
+                      if (tab.id === 'all') setFullEditorText(JSON.stringify(content, null, 2));
+                    }}
+                    className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${isActive ? 'bg-white text-[#18B68B] shadow-sm' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'}`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {activeSubTab === 'design' && (
@@ -401,10 +444,13 @@ export function AdminCMSSection() {
       {activeSubTab === 'all' && (
         <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-lg font-black text-slate-900">Control total del contenido</h3>
-            <p className="text-xs leading-relaxed text-slate-500">Aquí puedes cambiar absolutamente todos los textos, imágenes, listas, botones, documentos legales, ejemplos, etiquetas y configuraciones guardadas por la landing. Exporta una copia antes de hacer cambios grandes.</p>
+            <h3 className="text-lg font-black text-slate-900">Herramientas avanzadas y respaldo</h3>
+            <p className="text-xs leading-relaxed text-slate-500">La edición cotidiana está organizada en las pestañas de cada sección. Usa estas herramientas solo para ajustes estructurales o restauraciones.</p>
           </div>
-          <UniversalContentEditor value={content as any} onChange={(nextContent) => { updateContent(nextContent as any); notifySaved(); }} />
+          <details className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <summary className="cursor-pointer text-sm font-black text-slate-800">Editor estructurado avanzado</summary>
+            <div className="mt-4"><UniversalContentEditor value={content as any} onChange={(nextContent) => { updateContent(nextContent as any); notifySaved(); }} /></div>
+          </details>
           <details className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <summary className="cursor-pointer text-sm font-black text-slate-800">Editor JSON avanzado</summary>
             <div className="mt-4 space-y-3">
@@ -557,28 +603,29 @@ export function AdminCMSSection() {
           <div className="border-b border-slate-100 pb-3">
             <h3 className="font-black text-lg text-slate-900">Sección Hero Principal</h3>
             <p className="text-xs text-slate-500">
-              Modifica los textos, botones y la imagen principal que muestra la aplicación.
+              Modifica todos los textos, botones y el video de fondo de la portada.
             </p>
           </div>
 
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <div className="grid gap-4 sm:grid-cols-[150px_1fr] sm:items-center">
-                <img src={content.hero.previewImageUrl} alt={content.hero.previewImageAlt} className="mx-auto h-56 w-auto max-w-full object-contain" />
+              <div className="grid gap-4 lg:grid-cols-[minmax(240px,0.9fr)_minmax(0,1.1fr)] lg:items-center">
+                <video src={content.hero.backgroundVideoUrl} poster={content.hero.backgroundPosterUrl || undefined} className="h-56 w-full rounded-xl bg-slate-900 object-cover" controls muted loop preload="metadata" />
                 <div className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-xs font-bold text-slate-700">Imagen principal de la app</label>
-                    <input type="text" value={content.hero.previewImageUrl} onChange={(e) => updateSection('hero', { previewImageUrl: e.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
+                    <label className="mb-1 block text-xs font-bold text-slate-700">URL del video de fondo (MP4 o WebM)</label>
+                    <input type="text" value={content.hero.backgroundVideoUrl} onChange={(e) => updateSection('hero', { backgroundVideoUrl: e.target.value })} placeholder="/ruta/video.mp4" className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-bold text-slate-700">URL de la imagen de portada</label>
+                    <input type="text" value={content.hero.backgroundPosterUrl} onChange={(e) => updateSection('hero', { backgroundPosterUrl: e.target.value })} placeholder="/ruta/portada.webp" className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
                   </div>
                   <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white hover:bg-slate-800">
                     <Upload className="h-4 w-4" />
-                    {heroImageUploading ? 'Subiendo…' : 'Cambiar imagen'}
-                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" disabled={heroImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadHeroImage(file); event.target.value = ''; }} className="hidden" />
+                    {heroImageUploading ? 'Subiendo…' : 'Subir portada del video'}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={heroImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadHeroImage(file); event.target.value = ''; }} className="hidden" />
                   </label>
-                  <div>
-                    <label className="mb-1 block text-xs font-bold text-slate-700">Descripción accesible</label>
-                    <input type="text" value={content.hero.previewImageAlt} onChange={(e) => updateSection('hero', { previewImageAlt: e.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:ring-2 focus:ring-[#18B68B]" />
-                  </div>
+                  <p className="text-[11px] leading-relaxed text-slate-500">El video se reproduce automáticamente, sin sonido y en bucle. Puedes usar una ruta del sitio o una URL externa directa.</p>
                   {heroImageMessage && <p className="text-xs font-bold text-slate-600">{heroImageMessage}</p>}
                 </div>
               </div>
@@ -679,6 +726,15 @@ export function AdminCMSSection() {
               </div>
             </div>
 
+            <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-[11px] font-black uppercase tracking-wide text-slate-600">Destacados bajo los botones</p>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {content.hero.highlights.map((highlight, index) => (
+                  <input key={index} value={highlight} onChange={(event) => updateSection('hero', { highlights: content.hero.highlights.map((item, itemIndex) => itemIndex === index ? event.target.value : item) })} className="w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" aria-label={`Destacado ${index + 1}`} />
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Texto Destacado de Comunas</label>
               <input
@@ -692,10 +748,6 @@ export function AdminCMSSection() {
               />
             </div>
 
-            <div className="pt-2 border-t border-slate-100">
-              <label className="block text-xs font-bold text-slate-700 mb-1">Texto bajo la imagen</label>
-              <input type="text" value={content.hero.previewLabel} onChange={(e) => updateSection('hero', { previewLabel: e.target.value })} className="w-full text-xs p-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#18B68B]" />
-            </div>
           </div>
         </div>
       )}
@@ -814,6 +866,33 @@ export function AdminCMSSection() {
             >
               <Plus className="w-4 h-4" /> Agregar Publicación
             </button>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+            <h4 className="text-xs font-black uppercase tracking-wide text-emerald-900">Presentación y CTA horizontal</h4>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta superior<input value={content.scene.badge} onChange={(event) => updateSection('scene', { badge: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título<input value={content.scene.title} onChange={(event) => updateSection('scene', { title: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título destacado<input value={content.scene.titleHighlight} onChange={(event) => updateSection('scene', { titleHighlight: event.target.value })} className="mt-1 w-full rounded-lg border border-emerald-300 bg-white p-2 text-xs font-bold text-[#18B68B]" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Subtítulo<input value={content.scene.subtitle} onChange={(event) => updateSection('scene', { subtitle: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                ['filterAll', 'Filtro: todo'],
+                ['filterRent', 'Filtro: arriendos'],
+                ['filterGifts', 'Filtro: regalos'],
+                ['filterHelp', 'Filtro: ayuda'],
+                ['filterBusinesses', 'Filtro: comercios'],
+                ['filterAlerts', 'Filtro: alertas'],
+              ].map(([key, label]) => (
+                <label key={key} className="text-[11px] font-bold text-slate-700">{label}<input value={content.scene[key as keyof typeof content.scene]} onChange={(event) => updateSection('scene', { [key]: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-normal" /></label>
+              ))}
+            </div>
+            <div className="grid gap-3 lg:grid-cols-[1fr_1fr_0.55fr]">
+              <label className="text-[11px] font-bold text-slate-700">Título del CTA<input value={content.scene.bannerTitle} onChange={(event) => updateSection('scene', { bannerTitle: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Bajada del CTA<input value={content.scene.bannerText} onChange={(event) => updateSection('scene', { bannerText: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Botón<input value={content.scene.bannerCta} onChange={(event) => updateSection('scene', { bannerCta: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+            </div>
           </div>
 
           {/* Quick Image Presets Palette */}
@@ -1055,6 +1134,10 @@ export function AdminCMSSection() {
             </p>
           </div>
 
+          <label className="block text-xs font-bold text-slate-700">Etiqueta superior
+            <input value={content.benefits.badge} onChange={(event) => updateSection('benefits', { badge: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+          </label>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Título de la Sección</label>
@@ -1132,6 +1215,10 @@ export function AdminCMSSection() {
                 className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white"
               />
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta del pilar<input value={content.benefits.benefit1.tag} onChange={(event) => updateSection('benefits', { benefit1: { ...content.benefits.benefit1, tag: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Texto del CTA<input value={content.benefits.benefit1.cta} onChange={(event) => updateSection('benefits', { benefit1: { ...content.benefits.benefit1, cta: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+            </div>
           </div>
 
           {/* Benefit 2 */}
@@ -1182,6 +1269,10 @@ export function AdminCMSSection() {
                 }}
                 className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white"
               />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta del pilar<input value={content.benefits.benefit2.tag} onChange={(event) => updateSection('benefits', { benefit2: { ...content.benefits.benefit2, tag: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Texto del CTA<input value={content.benefits.benefit2.cta} onChange={(event) => updateSection('benefits', { benefit2: { ...content.benefits.benefit2, cta: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
             </div>
           </div>
 
@@ -1234,6 +1325,10 @@ export function AdminCMSSection() {
                 className="w-full text-xs p-2 rounded-lg border border-slate-300 bg-white"
               />
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta del pilar<input value={content.benefits.benefit3.tag} onChange={(event) => updateSection('benefits', { benefit3: { ...content.benefits.benefit3, tag: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Texto del CTA<input value={content.benefits.benefit3.cta} onChange={(event) => updateSection('benefits', { benefit3: { ...content.benefits.benefit3, cta: event.target.value } })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+            </div>
           </div>
         </div>
       )}
@@ -1247,6 +1342,8 @@ export function AdminCMSSection() {
               Edita el título, subtítulo, los 6 pilares de seguridad y la nota de transparencia.
             </p>
           </div>
+
+          <label className="block text-xs font-bold text-slate-700">Etiqueta superior<input value={content.trust.badge} onChange={(event) => updateSection('trust', { badge: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" /></label>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -1312,6 +1409,8 @@ export function AdminCMSSection() {
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Título del compromiso</label>
+            <input value={content.trust.transparencyTitle} onChange={(event) => updateSection('trust', { transparencyTitle: event.target.value })} className="mb-3 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold" />
             <label className="block text-xs font-bold text-slate-700 mb-1">Compromiso de Transparencia (Texto inferior)</label>
             <textarea
               rows={2}
@@ -1345,6 +1444,54 @@ export function AdminCMSSection() {
             </button>
           </div>
 
+          <div className="space-y-5 rounded-2xl border border-emerald-100 bg-emerald-50/30 p-4">
+            <h4 className="text-xs font-black uppercase tracking-wide text-emerald-900">Presentación completa de la sección</h4>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta superior<input value={content.businessSection.badge} onChange={(event) => updateSection('businessSection', { badge: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título<input value={content.businessSection.title} onChange={(event) => updateSection('businessSection', { title: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título destacado<input value={content.businessSection.titleHighlight} onChange={(event) => updateSection('businessSection', { titleHighlight: event.target.value })} className="mt-1 w-full rounded-lg border border-emerald-300 bg-white p-2 text-xs font-bold text-[#18B68B]" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Subtítulo<input value={content.businessSection.subtitle} onChange={(event) => updateSection('businessSection', { subtitle: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[220px_1fr] lg:items-start">
+              <img src={content.businessSection.imageUrl} alt={content.businessSection.imageAlt} className="h-40 w-full rounded-xl bg-slate-100 object-cover" />
+              <div className="space-y-3">
+                <label className="block text-[11px] font-bold text-slate-700">URL de la imagen principal<input value={content.businessSection.imageUrl} onChange={(event) => updateSection('businessSection', { imageUrl: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-normal" /></label>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white">
+                  <Upload className="h-4 w-4" />{sectionImageUploading ? 'Subiendo…' : 'Subir imagen principal'}
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={sectionImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadSectionImage(file, (url) => updateSection('businessSection', { imageUrl: url }), 'Imagen de Negocios actualizada.'); event.target.value = ''; }} className="hidden" />
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="text-[11px] font-bold text-slate-700">Descripción accesible<input value={content.businessSection.imageAlt} onChange={(event) => updateSection('businessSection', { imageAlt: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-normal" /></label>
+                  <label className="text-[11px] font-bold text-slate-700">Texto sobre la imagen<input value={content.businessSection.imageCaption} onChange={(event) => updateSection('businessSection', { imageCaption: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-normal" /></label>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {content.businessSection.features.map((feature, index) => (
+                <div key={index} className="space-y-2 rounded-xl border border-slate-200 bg-white p-3">
+                  <p className="text-[10px] font-black uppercase text-slate-500">Ventaja {index + 1}</p>
+                  <input value={feature.title} onChange={(event) => updateSection('businessSection', { features: content.businessSection.features.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item) })} className="w-full rounded-lg border border-slate-300 p-2 text-xs font-bold" />
+                  <textarea rows={2} value={feature.description} onChange={(event) => updateSection('businessSection', { features: content.businessSection.features.map((item, itemIndex) => itemIndex === index ? { ...item, description: event.target.value } : item) })} className="w-full rounded-lg border border-slate-300 p-2 text-xs" />
+                </div>
+              ))}
+            </div>
+
+            <label className="block text-[11px] font-bold text-slate-700">Título sobre los perfiles<input value={content.businessSection.profilesTitle} onChange={(event) => updateSection('businessSection', { profilesTitle: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+
+            <div className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+              <p className="text-[10px] font-black uppercase tracking-wide text-slate-500">CTA horizontal de Negocios</p>
+              <input value={content.businessSection.actionTitle} onChange={(event) => updateSection('businessSection', { actionTitle: event.target.value })} className="w-full rounded-lg border border-slate-300 p-2 text-xs font-bold" />
+              <textarea rows={2} value={content.businessSection.actionText} onChange={(event) => updateSection('businessSection', { actionText: event.target.value })} className="w-full rounded-lg border border-slate-300 p-2 text-xs" />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="text-[11px] font-bold text-slate-700">Botón comercio<input value={content.businessSection.commerceCta} onChange={(event) => updateSection('businessSection', { commerceCta: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs" /></label>
+                <label className="text-[11px] font-bold text-slate-700">Botón prestador<input value={content.businessSection.serviceCta} onChange={(event) => updateSection('businessSection', { serviceCta: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs" /></label>
+              </div>
+            </div>
+            {sectionImageMessage && <p className="text-xs font-bold text-slate-600">{sectionImageMessage}</p>}
+          </div>
+
           <div className="space-y-4">
             {content.businesses.map((biz) => {
               const isExpanded = editingBusinessId === biz.id;
@@ -1356,7 +1503,7 @@ export function AdminCMSSection() {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <img
-                        src={biz.coverImage}
+                        src={biz.avatar || biz.coverImage}
                         alt=""
                         className="w-12 h-12 rounded-xl object-cover shrink-0 border border-slate-200"
                         onError={(e) => {
@@ -1426,19 +1573,19 @@ export function AdminCMSSection() {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-700 mb-1">URL Foto de Portada</label>
+                        <label className="block text-[11px] font-bold text-slate-700 mb-1">Imagen visible en la tarjeta</label>
                         <input
                           type="url"
-                          value={biz.coverImage}
+                          value={biz.avatar}
                           onChange={(e) => {
-                            updateBusiness(biz.id, { coverImage: e.target.value });
+                            updateBusiness(biz.id, { avatar: e.target.value });
                             notifySaved();
                           }}
                           className="w-full text-xs p-2 rounded-lg border border-slate-300"
                         />
-                        {biz.coverImage && (
+                        {biz.avatar && (
                           <div className="mt-2 h-20 rounded-lg overflow-hidden border border-slate-200">
-                            <img src={biz.coverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                            <img src={biz.avatar} alt="Vista previa" className="w-full h-full object-cover" />
                           </div>
                         )}
                       </div>
@@ -1458,7 +1605,7 @@ export function AdminCMSSection() {
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Ubicación Aprox / Comuna</label>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">Ubicación aproximada</label>
                           <input
                             type="text"
                             value={biz.addressApprox}
@@ -1468,6 +1615,10 @@ export function AdminCMSSection() {
                             }}
                             className="w-full text-xs p-2 rounded-lg border border-slate-300"
                           />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <label className="text-[11px] font-bold text-slate-700">Comuna<input value={biz.commune} onChange={(event) => updateBusiness(biz.id, { commune: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs font-normal" /></label>
+                          <label className="text-[11px] font-bold text-slate-700">Calificación<input type="number" min="0" max="5" step="0.1" value={biz.rating} onChange={(event) => updateBusiness(biz.id, { rating: Number(event.target.value) })} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs font-normal" /></label>
                         </div>
                       </div>
 
@@ -1503,6 +1654,23 @@ export function AdminCMSSection() {
           </div>
 
           <div className="space-y-4">
+            <div className="grid gap-4 lg:grid-cols-[220px_1fr] lg:items-start">
+              <img src={content.localAds.imageUrl} alt={content.localAds.imageAlt} className="aspect-[16/9] w-full rounded-xl bg-slate-100 object-cover" />
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-slate-700">URL de la imagen sobre el botón<input value={content.localAds.imageUrl} onChange={(event) => updateSection('localAds', { imageUrl: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" /></label>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-black text-white">
+                  <Upload className="h-4 w-4" />{sectionImageUploading ? 'Subiendo…' : 'Subir imagen'}
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={sectionImageUploading} onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadSectionImage(file, (url) => updateSection('localAds', { imageUrl: url }), 'Imagen de Publicidad Local actualizada.'); event.target.value = ''; }} className="hidden" />
+                </label>
+                <label className="block text-xs font-bold text-slate-700">Descripción accesible<input value={content.localAds.imageAlt} onChange={(event) => updateSection('localAds', { imageAlt: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" /></label>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Etiqueta superior</label>
+              <input type="text" value={content.localAds.badge} onChange={(event) => updateSection('localAds', { badge: event.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs" />
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Título</label>
               <input
@@ -1582,6 +1750,12 @@ export function AdminCMSSection() {
                 className="w-full text-xs font-bold p-2.5 rounded-xl border border-slate-300"
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Nota bajo el botón</label>
+              <input type="text" value={content.localAds.note} onChange={(event) => updateSection('localAds', { note: event.target.value })} className="w-full rounded-xl border border-slate-300 p-2.5 text-xs" />
+            </div>
+            {sectionImageMessage && <p className="text-xs font-bold text-slate-600">{sectionImageMessage}</p>}
           </div>
         </div>
       )}
@@ -1603,6 +1777,27 @@ export function AdminCMSSection() {
             >
               <Plus className="w-4 h-4" /> Agregar Pregunta
             </button>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-emerald-100 bg-emerald-50/30 p-4">
+            <h4 className="text-xs font-black uppercase tracking-wide text-emerald-900">Presentación y columna izquierda</h4>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-[11px] font-bold text-slate-700">Etiqueta superior<input value={content.faqSection.badge} onChange={(event) => updateSection('faqSection', { badge: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título<input value={content.faqSection.title} onChange={(event) => updateSection('faqSection', { title: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Título destacado<input value={content.faqSection.titleHighlight} onChange={(event) => updateSection('faqSection', { titleHighlight: event.target.value })} className="mt-1 w-full rounded-lg border border-emerald-300 bg-white p-2 text-xs font-bold text-[#18B68B]" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Bajada<input value={content.faqSection.subtitle} onChange={(event) => updateSection('faqSection', { subtitle: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="text-[11px] font-bold text-slate-700">Filtro: todas<input value={content.faqSection.allLabel} onChange={(event) => updateSection('faqSection', { allLabel: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Filtro: general<input value={content.faqSection.generalLabel} onChange={(event) => updateSection('faqSection', { generalLabel: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Filtro: seguridad<input value={content.faqSection.securityLabel} onChange={(event) => updateSection('faqSection', { securityLabel: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Filtro: comercios<input value={content.faqSection.businessesLabel} onChange={(event) => updateSection('faqSection', { businessesLabel: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-3">
+              <label className="text-[11px] font-bold text-slate-700">Encabezado de contacto<input value={content.faqSection.contactEyebrow} onChange={(event) => updateSection('faqSection', { contactEyebrow: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Texto de contacto<input value={content.faqSection.contactText} onChange={(event) => updateSection('faqSection', { contactText: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs" /></label>
+              <label className="text-[11px] font-bold text-slate-700">Botón de WhatsApp<input value={content.faqSection.contactButton} onChange={(event) => updateSection('faqSection', { contactButton: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-bold" /></label>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -1831,49 +2026,47 @@ export function AdminCMSSection() {
           <div className="border-b border-slate-100 pb-3">
             <h3 className="font-black text-lg text-slate-900">Sección: Footer y Pie de Página</h3>
             <p className="text-xs text-slate-500">
-              Personaliza el texto institucional, copyright y notas territoriales.
+              Edita todos los textos visibles del pie de página y sus enlaces de navegación.
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Descripción Institucional</label>
-              <textarea
-                rows={2}
-                value={content.footer.description}
-                onChange={(e) => {
-                  updateSection('footer', { description: e.target.value });
-                  notifySaved();
-                }}
-                className="w-full text-xs p-2.5 rounded-xl border border-slate-300"
-              />
+          <div className="space-y-5">
+            <label className="block text-xs font-bold text-slate-700">Descripción institucional<textarea rows={3} value={content.footer.description} onChange={(event) => updateSection('footer', { description: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" /></label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                ['officialDomainText', 'Texto del dominio oficial'],
+                ['supportEmail', 'Correo de contacto'],
+                ['locationNotice', 'Ubicación y estado territorial'],
+                ['copyrightText', 'Copyright'],
+                ['navigationTitle', 'Título de navegación'],
+                ['legalTitle', 'Título de legales'],
+                ['contactTitle', 'Título de contacto'],
+                ['privacyLabel', 'Enlace de privacidad'],
+                ['termsLabel', 'Enlace de términos'],
+                ['communityLabel', 'Enlace de normas'],
+                ['madeForText', 'Frase final derecha'],
+              ].map(([key, label]) => (
+                <label key={key} className="text-xs font-bold text-slate-700">{label}
+                  <input value={content.footer[key as keyof typeof content.footer]} onChange={(event) => updateSection('footer', { [key]: event.target.value })} className="mt-1 w-full rounded-xl border border-slate-300 p-2.5 text-xs font-normal" />
+                </label>
+              ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Ubicación y Estado Territorial</label>
-                <input
-                  type="text"
-                  value={content.footer.locationNotice}
-                  onChange={(e) => {
-                    updateSection('footer', { locationNotice: e.target.value });
-                    notifySaved();
-                  }}
-                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Texto de Copyright</label>
-                <input
-                  type="text"
-                  value={content.footer.copyrightText}
-                  onChange={(e) => {
-                    updateSection('footer', { copyrightText: e.target.value });
-                    notifySaved();
-                  }}
-                  className="w-full text-xs p-2.5 rounded-xl border border-slate-300"
-                />
+            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <h4 className="text-xs font-black uppercase tracking-wide text-slate-700">Enlaces de navegación del Footer</h4>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  ['sceneLabel', 'Así se vive'],
+                  ['benefitsLabel', 'Beneficios'],
+                  ['trustLabel', 'Seguridad'],
+                  ['businessesLabel', 'Negocios'],
+                  ['faqLabel', 'Preguntas'],
+                ].map(([key, label]) => (
+                  <label key={key} className="text-[11px] font-bold text-slate-700">{label}
+                    <input value={content.navigation[key as keyof typeof content.navigation]} onChange={(event) => updateSection('navigation', { [key]: event.target.value })} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2 text-xs font-normal" />
+                  </label>
+                ))}
               </div>
             </div>
           </div>

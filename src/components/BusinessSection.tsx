@@ -36,10 +36,10 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         {/* Local business image + key benefits */}
         <div className="mb-16 grid grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.25fr]">
           <figure className="relative min-h-[340px] overflow-hidden rounded-3xl lg:min-h-[430px]">
-            <img src="/landing-media/comercio-local.jpg" alt="Comercio local de barrio" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+            <img src={section.imageUrl} alt={section.imageAlt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
             <figcaption className="absolute bottom-0 left-0 p-6 text-lg font-extrabold text-white sm:p-8">
-              Tu negocio, visible para quienes viven cerca.
+              {section.imageCaption}
             </figcaption>
           </figure>
 
@@ -69,7 +69,7 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
                 <img 
                   loading="lazy"
                   decoding="async"
-                  src={biz.avatar} 
+                  src={biz.avatar || biz.coverImage}
                   alt={biz.name}
                   onError={(e) => {
                     e.currentTarget.src = 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=120&q=80';

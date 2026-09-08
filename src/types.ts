@@ -177,6 +177,9 @@ export interface LocalAdsConfig {
   bullet1: string;
   bullet2: string;
   bullet3: string;
+  imageUrl: string;
+  imageAlt: string;
+  note: string;
 }
 
 export interface WaitlistFormConfig {
@@ -261,6 +264,9 @@ export interface BusinessFeatureConfig {
 }
 
 export interface BusinessSectionConfig extends SectionIntroConfig {
+  imageUrl: string;
+  imageAlt: string;
+  imageCaption: string;
   features: BusinessFeatureConfig[];
   profilesTitle: string;
   actionTitle: string;

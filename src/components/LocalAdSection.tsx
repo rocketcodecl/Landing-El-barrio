@@ -15,7 +15,10 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
     ctaButton: 'Consultar opciones de visibilidad',
     bullet1: 'Banners destacados en feed',
     bullet2: 'Posts patrocinados geolocalizados',
-    bullet3: 'Filtro por cuadrante exacto'
+    bullet3: 'Filtro por cuadrante exacto',
+    imageUrl: '/landing-media/comercio-local.jpg',
+    imageAlt: 'Comercio local atendiendo a personas del barrio',
+    note: 'Espacios limitados por cuadrante para proteger la experiencia vecinal.'
   };
 
   const badge = localAds.badge || 'Difusión Local Dirigida';
@@ -25,7 +28,7 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
   const bullet1 = localAds.bullet1 || 'Banners destacados en feed';
   const bullet2 = localAds.bullet2 || 'Posts patrocinados geolocalizados';
   const bullet3 = localAds.bullet3 || 'Filtro por cuadrante exacto';
-  const note = (localAds as any).note || 'Espacios limitados por cuadrante para proteger la experiencia vecinal.';
+  const note = localAds.note || 'Espacios limitados por cuadrante para proteger la experiencia vecinal.';
 
   return (
     <section className="py-16 bg-white border-b border-emerald-900/5">
@@ -67,6 +70,15 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
 
             <div className="lg:col-span-5 flex flex-col items-stretch sm:items-end justify-center">
               <div className="w-full max-w-sm space-y-2 flex flex-col items-stretch">
+                {localAds.imageUrl && (
+                  <img
+                    src={localAds.imageUrl}
+                    alt={localAds.imageAlt}
+                    className="mb-2 aspect-[16/9] w-full rounded-2xl object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
                 <button
                   onClick={() => window.location.assign('https://negocios.elbarrio.lat/')}
                   className="w-full bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm cursor-pointer text-center"
