@@ -1,6 +1,6 @@
 # AI Context — Landing pública de El Barrio
 
-Última actualización: 2 de septiembre de 2026.
+Última actualización: 9 de septiembre de 2026.
 
 Este documento entrega continuidad a cualquier nuevo chat o agente que trabaje en la landing. El código vigente tiene prioridad si algo de este archivo queda desactualizado.
 
@@ -11,7 +11,7 @@ Este documento entrega continuidad a cualquier nuevo chat o agente que trabaje e
 - Proyecto local: `/Users/fenha/Desktop/Landing-El-barrio-design-review`.
 - Repositorio: `https://github.com/rocketcodecl/Landing-El-barrio.git`.
 - Rama de trabajo vigente: `codex/design-review-20260825`.
-- Último commit al crear este documento: `180df62`.
+- Último commit funcional documentado: `87de085`.
 - Punto de retorno anterior al bloque visual: rama y tag `checkpoint/landing-antes-ajuste-visual-20260830` / `landing-antes-ajuste-visual-20260830`.
 - Esta carpeta es independiente del repositorio principal de la app.
 - No modificar desde aquí la app móvil, Supabase, el panel `admin.elbarrio.lat` ni el código de `business-portal`.
@@ -80,13 +80,21 @@ Archivos centrales:
 
 - Fondo en video: `/landing-media/hero-barrio.mp4`.
 - Póster: `/landing-media/hero-barrio-poster.jpg`.
+- El video de fondo puede reemplazarse desde el CMS mediante una URL MP4/WebM.
+- El póster puede reemplazarse mediante URL o carga directa de una imagen.
 - El video debe ser visible bajo una única trama blanca; no volver a superponer capas que lo oculten.
 - Texto principal a la izquierda.
-- Mockup de la app a la derecha usando `/landing-media/hero-app-preview.svg`.
-- El mockup no lleva sombra ni texto inferior.
+- El mockup/teléfono que aparecía a la derecha fue eliminado.
 - Altura reducida respecto de la versión original: aproximadamente 600–640 px.
 - El CTA vecinal baja al formulario.
 - El CTA de comercio o servicio abre `https://negocios.elbarrio.lat/`.
+
+### Relato editorial
+
+- Después del hero se muestra el bloque “Volver a sentir que vivimos en un barrio”.
+- Explica el propósito humano de El Barrio antes del detalle funcional.
+- Su imagen o video, póster, textos, texto alternativo y pie son editables desde su propia sección del CMS.
+- Recurso visual predeterminado: `/landing-media/historia-barrio.webp`.
 
 ### Beneficios
 
@@ -103,6 +111,7 @@ Archivos centrales:
 ### Comercios y servicios
 
 - Incluye una fotografía visible de comercio local: `/landing-media/comercio-local.jpg`.
+- La presentación, imagen principal, cuatro ventajas, perfiles y CTA horizontal son editables desde la sección correspondiente del CMS.
 - La fotografía se presenta junto a las cuatro ventajas, no oculta tras una capa blanca.
 - Los botones de comercio y servicio abren `https://negocios.elbarrio.lat/`.
 - El mismo destino se usa desde el hero, el menú móvil y el bloque de publicidad.
@@ -110,6 +119,7 @@ Archivos centrales:
 ### Publicidad local
 
 - La pill “Difusión Local Dirigida” tiene fondo verde y texto blanco.
+- Incluye una imagen editable sobre el botón, con el mismo ancho que este.
 - “Posts patrocinados geolocalizados” debe permanecer en una línea.
 - Las tres características pueden desplazarse horizontalmente en pantallas estrechas antes que quebrar su texto.
 
@@ -117,6 +127,7 @@ Archivos centrales:
 
 - Los filtros cambian la lista con fade.
 - Las respuestas se abren y cierran con una transición suave de altura y opacidad.
+- La presentación izquierda, título, bajada, etiquetas de filtros y CTA de contacto son editables desde la sección FAQ del CMS.
 - El contacto abre WhatsApp al número comercial oficial `+56 9 3530 4705` con mensaje precargado.
 
 ### Formulario
@@ -131,6 +142,10 @@ Archivos centrales:
 - El contenido remoto se consulta en `GET /api/site-content` y se combina recursivamente con los valores por defecto.
 - El guardado del CMS usa `PUT /api/site-content` con sesión administrativa.
 - Los cambios de contenido se guardan automáticamente con espera breve.
+- Los editores habituales están organizados por sección y en el mismo orden de la landing: Hero, Corazón, Así se vive, Beneficios, Seguridad, Negocios y Servicios, Publicidad Local, FAQ, Formulario y Footer.
+- Marca, diseño global, visibilidad/orden, biblioteca, SEO y herramientas avanzadas permanecen separados como configuración general.
+- El editor JSON completo está dentro de “Herramientas avanzadas y respaldo” y permanece plegado de forma predeterminada.
+- El Footer completo, incluidos sus enlaces de navegación visibles, es editable desde su propia sección.
 - La biblioteca usa `/api/media` y sirve archivos desde `/api/media/files`.
 - La lista de espera usa `/api/waitlist` y permite exportar CSV.
 - La analítica propia registra visitas y presencia aproximada mediante `/api/analytics/visit` y `/api/analytics/live`.
@@ -141,6 +156,9 @@ Archivos centrales:
 - El build estático sale en `dist/`.
 - Producción corre en Plesk/nginx y el backend Express se gestiona por separado.
 - Publicar primero los assets con hash y finalmente `index.html`, evitando referencias temporales rotas.
+- Una publicación del frontend nunca debe subir, reemplazar ni inicializar `/private/landing-data`, `site-content.json` o la carpeta `media` del CMS.
+- Antes de cada publicación se debe descargar una copia fechada de `site-content.json` y registrar el inventario de `media`.
+- Después de cada publicación se debe comparar el contenido remoto con la copia previa y confirmar que textos, imágenes y orden se conservaron.
 - Después de publicar, verificar `HTTP 200`, los hashes CSS/JS del HTML y los recursos multimedia relevantes.
 - No afirmar que una modificación está publicada sin compilar y verificar producción.
 
@@ -163,4 +181,16 @@ Archivos centrales:
 - `44f2446`: contacto FAQ cambiado a WhatsApp.
 - `8a572b0`: títulos, pills y transiciones FAQ.
 - `180df62`: altura completa y centrado de las demostraciones de beneficios.
+- `e14b812`: eliminación del teléfono/mockup del hero.
+- `3e7cc8a`: jerarquía tipográfica light/bold del título del hero.
+- `ac5391a`: incorporación del relato editorial central.
+- `874e665`: administración del contenido y medios del relato editorial.
+- `87de085`: reorganización del CMS y edición completa de Hero, Negocios, CTA, Publicidad Local, FAQ y Footer.
 
+## Estado comprobado al 9 de septiembre de 2026
+
+- Producción sirve `assets/index-CM3mPZM1.js` y `assets/index-D4FlGxtn.css`.
+- La landing y `/admin/` respondieron HTTP 200 tras la publicación de `87de085`.
+- Los bundles descargados desde FTP coincidieron byte por byte con el build local.
+- El contenido remoto del CMS y las seis imágenes cargadas el 8 de septiembre seguían presentes en `/private/landing-data` después de la publicación.
+- El orden remoto comprobado comenzaba con Hero, Beneficios y Así se vive.
