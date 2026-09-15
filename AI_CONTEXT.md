@@ -194,3 +194,13 @@ Archivos centrales:
 - Los bundles descargados desde FTP coincidieron byte por byte con el build local.
 - El contenido remoto del CMS y las seis imágenes cargadas el 8 de septiembre seguían presentes en `/private/landing-data` después de la publicación.
 - El orden remoto comprobado comenzaba con Hero, Beneficios y Así se vive.
+
+## Revisión móvil del Hero — 15 de septiembre de 2026
+
+- Se revisó la landing publicada en `https://elbarrio.lat/` con emulación móvil real a 360, 390 y 430 px.
+- No se modificó código del Hero durante esta revisión.
+- El Hero actual es técnicamente responsive, pero la composición móvil es deficiente: demasiada información antes del CTA, contraste inconsistente sobre el video y jerarquía visual poco clara.
+- El overlay actual es un degradado horizontal pensado para escritorio; en móvil deja partes del texto sobre zonas visualmente ruidosas del video.
+- A 360 px el Hero mide aproximadamente 837 px de alto y el primer CTA comienza cerca de los 550 px, por lo que la primera pantalla queda sobrecargada.
+- Próximo paso acordado: diseñar una variante móvil específica sin afectar desktop, priorizando badge + titular + bajada breve + CTA principal, mejor contraste y encuadre del video; luego validar a 360/390/430 px antes de decidir si se publica.
+- Punto de partida de código antes de esta revisión: `725d230` en `codex/design-review-20260825`.
