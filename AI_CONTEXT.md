@@ -228,6 +228,18 @@ Archivos centrales:
 - Ruta física verificada: `/var/www/vhosts/elbarrio.lat/httpdocs/preview-launch-20260916`.
 - Servidor verificado: `144.126.129.239`, acceso SSH como `root` mediante `~/.ssh/elbarrio_remote_ed25519`.
 - El preview es el entorno de revisión; no usar localhost como sustituto cuando se acuerde revisar en stage.
-- Para frontend: compilar `dist/`, copiar primero assets/archivos estáticos y `index.html` al final. No usar `--delete` contra producción ni tocar backend/CMS.
+- Para producción: compilar `dist/`, copiar primero assets/archivos estáticos y `index.html` al final. No usar `--delete` ni tocar backend/CMS.
+- Para el preview en subruta, no asumir que un build con rutas absolutas `/assets/...` funciona dentro de `/preview-launch-20260916/`; el método exacto de base/rutas del preview debe verificarse antes de cada subida.
 - Producción sigue en `/var/www/vhosts/elbarrio.lat/httpdocs/` y solo se publica con autorización explícita “publica”.
 - Git: el push que había quedado pendiente en la sesión anterior fue completado el 16/09/2026; `origin/codex/design-review-20260825` quedó creado correctamente desde HEAD `5cd3872`.
+
+## Publicación producción — 16 de septiembre de 2026
+
+- Commit publicado: `e7e4552` (`feat: redisenar beneficios movil con tabs`).
+- Rama remota verificada: `origin/codex/design-review-20260825` apunta a `e7e4552`.
+- Backup frontend previo: `/var/www/vhosts/elbarrio.lat/private/deploy-backups/20260916-174154/`.
+- Copia local de seguridad CMS: `/Users/fenha/Desktop/elbarrio-deploy-backups/20260916-174154/site-content.json`.
+- Bundles publicados: `assets/index-B8gCsXK8.js` y `assets/index-CLJfxuGb.css`.
+- Producción verificada HTTP 200 para raíz, JS y CSS.
+- `site-content.json` conservó SHA-256 `c44ae40e77b9ff2b277da0bd756abf4b5fccd91ed0e6930c3c743ff52b0bc22a` antes/después.
+- Inventario de medios permaneció en 8 archivos. Backend/CMS no se reinició ni reemplazó.
