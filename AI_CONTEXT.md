@@ -204,3 +204,20 @@ Archivos centrales:
 - A 360 px el Hero mide aproximadamente 837 px de alto y el primer CTA comienza cerca de los 550 px, por lo que la primera pantalla queda sobrecargada.
 - Próximo paso acordado: diseñar una variante móvil específica sin afectar desktop, priorizando badge + titular + bajada breve + CTA principal, mejor contraste y encuadre del video; luego validar a 360/390/430 px antes de decidir si se publica.
 - Punto de partida de código antes de esta revisión: `725d230` en `codex/design-review-20260825`.
+
+## Checkpoint previo al rediseño móvil de Beneficios — 16 de septiembre de 2026
+
+- Checkpoint funcional aprobado: `91f9ac7` (`feat: cerrar mejoras moviles previas al lanzamiento`).
+- Ese checkpoint fue publicado en `https://elbarrio.lat/` el 16/09/2026 antes de iniciar el rediseño móvil de “Tres grandes beneficios”.
+- Backup del frontend previo en servidor: `/var/www/vhosts/elbarrio.lat/private/deploy-backups/20260916-171453/`.
+- Producción verificada en 390 px: ancho 390 sin overflow horizontal, Hero 528 px y título móvil 36 px.
+- Hero móvil aprobado como base: un solo CTA vecinal; el CTA comercial fue retirado del Hero, pero los datos CMS correspondientes no se eliminaron.
+- El Hero usa video visible con protección localizada de lectura y fade inferior hacia `#F3F8F5` para fundirse con la sección siguiente.
+- Indicador inferior: mouse animado con dos chevrons sutiles. Se considera suficiente por ahora; no bloquear el avance por este detalle.
+- Menú desktop/móvil ahora oculta enlaces cuyas secciones están desactivadas en el CMS; “Así se vive” no aparece mientras esa sección esté oculta.
+- Se eliminaron fallbacks externos problemáticos de Unsplash en el render inicial y se sustituyeron por assets locales estables.
+- QA del preview/producción: 0 requests fallidos y 0 respuestas HTTP 4xx/5xx al recorrer la landing.
+- `/admin/` sigue aislado de la landing pública y muestra acceso protegido; no renderiza el Hero.
+- `site-content.json` no fue modificado por el despliegue y el backend no se publicó ni reinició.
+- No se hizo `git push`.
+- Próximo trabajo: rediseñar SOLO la experiencia móvil de “Tres grandes beneficios”, manteniendo desktop y contenido CMS intactos. Dirección acordada: tabs `Conecta / Resuelve / Cuida` + un panel visible a la vez, swipe opcional y demostración compacta tipo app.
