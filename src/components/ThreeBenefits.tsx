@@ -1,3 +1,4 @@
+import { useRef, useState, type TouchEvent } from 'react';
 import { Users, ShoppingBag, ShieldAlert, Check, ArrowRight, MapPin, MessageSquare, BadgeCheck } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -12,9 +13,30 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
   const b1 = benefits.benefit1;
   const b2 = benefits.benefit2;
   const b3 = benefits.benefit3;
+  const [activeMobileBenefit, setActiveMobileBenefit] = useState(0);
+  const mobileTouchStartX = useRef<number | null>(null);
+  const mobileBenefits = [
+    { label: b1.tag?.replace(/^\d+\.\s*/, '') || 'Conecta', benefit: b1, icon: Users },
+    { label: b2.tag?.replace(/^\d+\.\s*/, '') || 'Resuelve', benefit: b2, icon: ShoppingBag },
+    { label: b3.tag?.replace(/^\d+\.\s*/, '') || 'Cuida', benefit: b3, icon: ShieldAlert },
+  ];
+  const activeMobile = mobileBenefits[activeMobileBenefit];
+  const ActiveMobileIcon = activeMobile.icon;
+
+  const handleMobileSwipeStart = (event: TouchEvent<HTMLDivElement>) => {
+    mobileTouchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleMobileSwipeEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (mobileTouchStartX.current === null) return;
+    const delta = event.changedTouches[0]?.clientX - mobileTouchStartX.current;
+    mobileTouchStartX.current = null;
+    if (Math.abs(delta) < 45) return;
+    setActiveMobileBenefit((current) => delta < 0 ? Math.min(current + 1, 2) : Math.max(current - 1, 0));
+  };
 
   return (
-    <section id="beneficios" className="py-20 bg-[#FAFDFB]">
+    <section id="beneficios" className="bg-[#FAFDFB] py-14 md:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -29,6 +51,133 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
             {benefits.subtitle || 'Todo lo que necesitas para tu vida cotidiana a pasos de tu hogar.'}
           </p>
         </div>
+
+        {/* Mobile benefits: tabs + single active panel */}
+        <div className="md:hidden">
+          <div className="grid grid-cols-3 gap-1 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-sm">
+            {mobileBenefits.map((item, index) => {
+              const TabIcon = item.icon;
+              const isActive = activeMobileBenefit === index;
+              return (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => setActiveMobileBenefit(index)}
+                  className={`flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 text-[13px] font-extrabold transition-all ${isActive ? 'bg-[#18B68B] text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                  aria-pressed={isActive}
+                >
+                  <TabIcon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            onTouchStart={handleMobileSwipeStart}
+            onTouchEnd={handleMobileSwipeEnd}
+            className="mt-4 overflow-hidden rounded-[28px] border border-slate-200/80 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)]"
+          >
+            <div className="p-5 pb-4">
+              <div className="flex items-start gap-3">
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${activeMobileBenefit === 0 ? 'bg-emerald-100 text-emerald-700' : activeMobileBenefit === 1 ? 'bg-purple-100 text-purple-700' : 'bg-red-100 text-red-700'}`}>
+                  <ActiveMobileIcon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <span className={`text-[11px] font-extrabold uppercase tracking-[0.16em] ${activeMobileBenefit === 0 ? 'text-emerald-700' : activeMobileBenefit === 1 ? 'text-purple-700' : 'text-red-700'}`}>
+                    {activeMobile.benefit.tag}
+                  </span>
+                  <h3 className="mt-1 text-[22px] font-extrabold leading-[1.15] tracking-tight text-slate-900">
+                    {activeMobile.benefit.title}
+                  </h3>
+                </div>
+              </div>
+
+              <p className="mt-4 text-[14px] leading-6 text-slate-600">
+                {activeMobile.benefit.description}
+              </p>
+
+              <ul className="mt-4 space-y-2.5">
+                {(activeMobile.benefit.points || []).map((bullet, index) => (
+                  <li key={index} className="flex items-start gap-2.5 text-[12.5px] font-medium leading-5 text-slate-700">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#18B68B]/10 text-[#18B68B]">
+                      <Check className="h-3 w-3 stroke-[3]" />
+                    </span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={`mx-3 rounded-[22px] p-3.5 ${activeMobileBenefit === 0 ? 'bg-emerald-50/80' : activeMobileBenefit === 1 ? 'bg-purple-50/80' : 'bg-red-50/80'}`}>
+              {activeMobileBenefit === 0 && (
+                <div className="rounded-2xl border border-emerald-100 bg-white p-3.5 shadow-sm">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#18B68B] text-xs font-extrabold text-white">JV</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1 text-[13px] font-extrabold text-slate-900">
+                        <span className="truncate">{b1.sampleTitle}</span>
+                        <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-[#18B68B]" />
+                      </div>
+                      <p className="truncate text-[10.5px] text-slate-500">{b1.sampleSubtitle}</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-[11.5px] italic leading-5 text-slate-600">“{b1.sampleBody}”</p>
+                  <div className="mt-3 flex items-center justify-between gap-3 text-[10.5px] font-bold text-slate-500">
+                    <span className="flex min-w-0 items-center gap-1 text-[#18B68B]"><MapPin className="h-3 w-3 shrink-0" /><span className="truncate">{b1.sampleMetaLeft}</span></span>
+                    <span className="shrink-0">{b1.sampleMetaRight}</span>
+                  </div>
+                </div>
+              )}
+
+              {activeMobileBenefit === 1 && (
+                <div className="space-y-2">
+                  {[
+                    ['🪜', b2.sampleTitle, b2.sampleSubtitle, b2.samplePrice],
+                    ['🎁', b2.secondarySampleTitle, b2.secondarySampleSubtitle, b2.secondarySamplePrice],
+                    ['🔧', b2.tertiarySampleTitle, b2.tertiarySampleSubtitle, b2.tertiarySamplePrice],
+                  ].map(([emoji, title, subtitle, price]) => (
+                    <div key={title} className="flex items-center gap-2.5 rounded-2xl border border-purple-100 bg-white p-3 shadow-sm">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-base">{emoji}</div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[12px] font-extrabold text-slate-900">{title}</p>
+                        <p className="truncate text-[10.5px] text-slate-500">{subtitle}</p>
+                      </div>
+                      <span className="max-w-[92px] shrink-0 text-right text-[10.5px] font-extrabold leading-4 text-purple-700">{price}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeMobileBenefit === 2 && (
+                <div className="rounded-2xl border border-red-100 bg-white p-3.5 shadow-sm">
+                  <div className="flex items-center justify-between gap-3 text-[10.5px] font-extrabold text-red-700">
+                    <span className="flex items-center gap-1.5"><ShieldAlert className="h-3.5 w-3.5" /> Alerta del cuadrante</span>
+                    <span className="rounded-full bg-emerald-50 px-2 py-1 text-[9.5px] text-emerald-700">{b3.sampleTag}</span>
+                  </div>
+                  <h4 className="mt-3 text-[13px] font-extrabold leading-5 text-slate-900">{b3.sampleTitle}</h4>
+                  <p className="mt-1 text-[10.5px] leading-4 text-slate-500">{b3.sampleSubtitle}</p>
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-red-100 pt-2.5 text-[10px] font-bold text-slate-500">
+                    <span>{b3.sampleMetaLeft}</span>
+                    <span className="text-[#18B68B]">{b3.sampleMetaRight}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-3 pt-4">
+              <button
+                onClick={() => { onSelectRole('vecino'); onScrollToForm(); }}
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#18B68B] px-4 text-sm font-extrabold text-white shadow-sm transition-transform active:scale-[0.99]"
+              >
+                <span>{activeMobile.benefit.cta}</span>
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <div className="hidden md:block">
 
         {/* Benefit 1: CONECTA */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-12 items-stretch mb-14 sm:mb-20 lg:mb-24">
@@ -252,6 +401,8 @@ export function ThreeBenefits({ onSelectRole, onScrollToForm }: ThreeBenefitsPro
               </div>
             </div>
           </div>
+        </div>
+
         </div>
 
       </div>

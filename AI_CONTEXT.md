@@ -221,3 +221,13 @@ Archivos centrales:
 - `site-content.json` no fue modificado por el despliegue y el backend no se publicó ni reinició.
 - No se hizo `git push`.
 - Próximo trabajo: rediseñar SOLO la experiencia móvil de “Tres grandes beneficios”, manteniendo desktop y contenido CMS intactos. Dirección acordada: tabs `Conecta / Resuelve / Cuida` + un panel visible a la vez, swipe opcional y demostración compacta tipo app.
+
+## Preview de lanzamiento y flujo de despliegue — 16 de septiembre de 2026
+
+- Preview remoto de revisión: `https://elbarrio.lat/preview-launch-20260916/`.
+- Ruta física verificada: `/var/www/vhosts/elbarrio.lat/httpdocs/preview-launch-20260916`.
+- Servidor verificado: `144.126.129.239`, acceso SSH como `root` mediante `~/.ssh/elbarrio_remote_ed25519`.
+- El preview es el entorno de revisión; no usar localhost como sustituto cuando se acuerde revisar en stage.
+- Para frontend: compilar `dist/`, copiar primero assets/archivos estáticos y `index.html` al final. No usar `--delete` contra producción ni tocar backend/CMS.
+- Producción sigue en `/var/www/vhosts/elbarrio.lat/httpdocs/` y solo se publica con autorización explícita “publica”.
+- Git: el push que había quedado pendiente en la sesión anterior fue completado el 16/09/2026; `origin/codex/design-review-20260825` quedó creado correctamente desde HEAD `5cd3872`.
