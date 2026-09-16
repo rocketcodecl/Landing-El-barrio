@@ -12,6 +12,8 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
   const { content } = useSiteContent();
   const navigation = content.navigation;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const sectionVisible = (sectionId: string) =>
+    content.layout.sections.some((section) => section.id === sectionId && section.visible);
 
   const handleNavClick = (id: string) => {
     onScrollToSection(id);
@@ -45,18 +47,23 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
 
           {/* Desktop Navigation Links */}
           <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+{sectionVisible('scene') && (
             <button 
               onClick={() => handleNavClick('asi-se-vive')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
               {navigation.sceneLabel}
             </button>
+            )}
+{sectionVisible('benefits') && (
             <button 
               onClick={() => handleNavClick('beneficios')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
               {navigation.benefitsLabel}
             </button>
+            )}
+{sectionVisible('trust') && (
             <button 
               onClick={() => handleNavClick('seguridad')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1 flex items-center gap-1.5"
@@ -64,18 +71,23 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
               {navigation.trustLabel}
             </button>
+            )}
+{sectionVisible('businesses') && (
             <button 
               onClick={() => handleNavClick('comercios')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
               {navigation.businessesLabel}
             </button>
+            )}
+{sectionVisible('faq') && (
             <button 
               onClick={() => handleNavClick('faq')} 
               className="hover:text-[#18B68B] transition-colors cursor-pointer py-1"
             >
               {navigation.faqLabel}
             </button>
+            )}
           </nav>
 
           {/* Action CTAs */}
@@ -108,18 +120,23 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
       {mobileMenuOpen && (
         <div id="mobile-navigation" className="md:hidden bg-white border-b border-emerald-900/10 px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in slide-in-from-top duration-200">
           <div className="flex flex-col space-y-2">
+{sectionVisible('scene') && (
             <button
               onClick={() => handleNavClick('asi-se-vive')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
               {navigation.sceneLabel}
             </button>
+            )}
+{sectionVisible('benefits') && (
             <button
               onClick={() => handleNavClick('beneficios')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
               {navigation.benefitsLabel}
             </button>
+            )}
+{sectionVisible('trust') && (
             <button
               onClick={() => handleNavClick('seguridad')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium flex items-center justify-between"
@@ -127,18 +144,23 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
               <span>{navigation.trustLabel}</span>
               <ShieldCheck className="w-4 h-4 text-[#18B68B]" />
             </button>
+            )}
+{sectionVisible('businesses') && (
             <button
               onClick={() => handleNavClick('comercios')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
               {navigation.businessesLabel}
             </button>
+            )}
+{sectionVisible('faq') && (
             <button
               onClick={() => handleNavClick('faq')}
               className="text-left py-2.5 px-3 rounded-lg text-slate-700 hover:bg-emerald-50 font-medium"
             >
               {navigation.faqLabel}
             </button>
+            )}
           </div>
 
           <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">

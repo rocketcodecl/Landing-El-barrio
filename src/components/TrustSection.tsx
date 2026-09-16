@@ -70,7 +70,7 @@ export function TrustSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-6xl mx-auto mb-16 space-y-4">
+        <div className="text-center max-w-6xl mx-auto mb-10 sm:mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18B68B] text-white text-xs font-bold uppercase tracking-wider border border-[#18B68B]">
             <ShieldCheck className="w-4 h-4 text-white" />
             <span>{badge}</span>
@@ -86,11 +86,11 @@ export function TrustSection() {
         </div>
 
         {/* Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-8 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
           {pillars.map((pilar, idx) => (
             <div 
               key={idx}
-              className="bg-white/90 p-6 rounded-2xl border border-slate-200 hover:border-[#18B68B]/60 transition-all group shadow-sm"
+              className="basis-[82vw] shrink-0 snap-start bg-white/90 p-5 sm:p-6 rounded-2xl border border-slate-200 hover:border-[#18B68B]/60 transition-all group shadow-sm md:basis-auto"
             >
               <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center mb-5 group-hover:scale-105 transition-transform">
                 {iconMap[idx] || <CheckCircle className="w-6 h-6 text-[#18B68B]" />}
@@ -106,7 +106,7 @@ export function TrustSection() {
         </div>
 
         {/* Transparency Commitment Note */}
-        <div className="mt-14 max-w-4xl mx-auto bg-white/85 rounded-2xl p-6 border border-slate-200 text-center space-y-2 shadow-sm">
+        <div className="mt-10 sm:mt-14 max-w-4xl mx-auto bg-white/85 rounded-2xl p-5 sm:p-6 border border-slate-200 text-center space-y-2 shadow-sm">
           <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">
             {trust.transparencyTitle || 'Compromiso de Transparencia'}
           </p>

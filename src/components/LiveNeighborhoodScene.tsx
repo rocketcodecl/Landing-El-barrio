@@ -59,7 +59,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-[#18B68B] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{scene.badge}</span>
@@ -74,7 +74,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
           </p>
 
           {/* Filter Pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-4" role="group" aria-label="Filtrar ejemplos de publicaciones">
+          <div className="-mx-4 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto px-4 pb-2 pt-3 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:pb-0 sm:pt-4" role="group" aria-label="Filtrar ejemplos de publicaciones">
             {[
               { id: 'todos', label: scene.filterAll },
               { id: 'mercado', label: scene.filterRent },
@@ -87,7 +87,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id)}
                 aria-pressed={activeFilter === tab.id}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                className={`shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                   activeFilter === tab.id
                     ? 'bg-[#18B68B] text-white shadow-md shadow-[#18B68B]/20'
                     : 'bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-[#18B68B]'
@@ -100,13 +100,13 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
         </div>
 
         {/* Live Posts Stream Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
           {filteredPosts.map(post => {
             const extraLikes = likedPosts[post.id] || 0;
             return (
               <div
                 key={post.id}
-                className={`bg-white rounded-2xl p-5 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between ${
+                className={`basis-[82vw] shrink-0 snap-start bg-white rounded-2xl p-4 sm:p-5 border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between md:basis-auto ${
                   post.urgent 
                     ? 'border-red-300 ring-2 ring-red-400/20 bg-gradient-to-b from-red-50/40 to-white' 
                     : 'border-slate-200/90 hover:border-[#18B68B]/50'
@@ -143,7 +143,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
                   </div>
 
                   {/* Post Image */}
-                  <div className="relative h-48 sm:h-52 rounded-xl overflow-hidden mb-3.5 border border-slate-100 shadow-2xs group-hover:shadow-xs transition-shadow bg-slate-100">
+                  <div className="relative h-44 sm:h-52 rounded-xl overflow-hidden mb-3.5 border border-slate-100 shadow-2xs group-hover:shadow-xs transition-shadow bg-slate-100">
                     <img 
                       loading="lazy"
                       decoding="async"
@@ -151,14 +151,10 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
                       alt={post.title} 
                       onError={(e) => {
                         const fallbacks: Record<string, string> = {
-                          arriendo: 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=600&q=80',
-                          regalo: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80',
-                          comercio: 'https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=600&q=80',
-                          ayuda: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=600&q=80',
-                          alerta: 'https://images.unsplash.com/photo-1584727638096-042c45049ebe?auto=format&fit=crop&w=600&q=80',
-                          servicio: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=600&q=80'
+                          comercio: '/landing-media/comercio-local.jpg',
                         };
-                        e.currentTarget.src = fallbacks[post.type] || 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=600&q=80';
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = fallbacks[post.type] || '/landing-media/barrio-comunidad.jpg';
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -210,7 +206,7 @@ export function LiveNeighborhoodScene({ onInteractPost }: LiveSceneProps) {
         </div>
 
         {/* Bottom Banner */}
-        <div className="mt-12 bg-gradient-to-r from-emerald-900 to-slate-900 rounded-2xl p-6 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="mt-8 sm:mt-12 bg-gradient-to-r from-emerald-900 to-slate-900 rounded-2xl p-5 sm:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 shadow-xl">
           <div className="space-y-1 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-extrabold">
               {scene.bannerTitle}

@@ -14,9 +14,9 @@ export function NeighborhoodStory() {
   const fallbackImage = story.mediaPosterUrl || '/landing-media/historia-barrio.webp';
 
   return (
-    <section aria-labelledby="corazon-el-barrio" className="overflow-hidden bg-[#F3F8F5] text-slate-950">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16 lg:px-8">
-        <figure className="relative h-[440px] overflow-hidden rounded-3xl sm:h-[560px] lg:h-[680px]">
+    <section aria-labelledby="corazon-el-barrio" className="story-section overflow-hidden bg-[#F3F8F5] text-slate-950">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 sm:gap-12 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16 lg:px-8">
+        <figure className="relative h-[280px] overflow-hidden rounded-3xl sm:h-[560px] lg:h-[680px]">
           {/* Photo: Cláudio Luiz Castro, Santiago, via Unsplash (EtDDUG1tyJk). */}
           {showVideo ? (
             <video
@@ -48,7 +48,7 @@ export function NeighborhoodStory() {
         </figure>
 
         <div className="max-w-xl lg:py-8">
-          <p className="mb-5 text-xs font-extrabold uppercase tracking-[0.16em] text-[#0E8067] sm:text-sm">
+          <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-[#0E8067] sm:mb-5 sm:text-sm">
             {story.eyebrow}
           </p>
 
@@ -57,7 +57,7 @@ export function NeighborhoodStory() {
             <span className="font-black text-[#0E8067]">{story.titleHighlight}</span>
           </h2>
 
-          <div className="mt-8 space-y-5 text-base leading-relaxed text-slate-700 sm:text-lg">
+          <div className="mt-5 space-y-3 text-[15px] leading-6 text-slate-700 sm:mt-8 sm:space-y-5 sm:text-lg sm:leading-relaxed">
             <p>
               {story.paragraph1}
             </p>
@@ -69,7 +69,7 @@ export function NeighborhoodStory() {
             </p>
           </div>
 
-          <p className="mt-9 border-l-2 border-[#18B68B] pl-5 text-xl font-bold leading-snug text-slate-950 sm:text-2xl">
+          <p className="mt-6 border-l-2 border-[#18B68B] pl-4 text-base font-bold leading-snug text-slate-950 sm:mt-9 sm:pl-5 sm:text-2xl">
             {story.closingText}
           </p>
         </div>

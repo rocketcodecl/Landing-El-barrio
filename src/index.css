@@ -69,6 +69,28 @@ button, input, select, textarea {
   border: 1px solid rgba(24, 182, 139, 0.12);
 }
 
+@keyframes hero-scroll-wheel {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  72% { transform: translateY(10px); opacity: 1; }
+  100% { transform: translateY(13px); opacity: 0; }
+}
+
+.hero-scroll-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hero-scroll-wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes hero-scroll-chevrons {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(3px); opacity: 0.8; }
+}
+
+.hero-scroll-chevrons {
+  animation: hero-scroll-chevrons 1.7s ease-in-out infinite;
+}
+
 /* Variables administradas desde el CMS */
 html,
 body {
@@ -88,6 +110,26 @@ nav {
 
 main h1 {
   font-size: var(--cms-hero-mobile, 40px) !important;
+}
+
+@media (max-width: 639px) {
+  main > section.hero-section {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  main .hero-title {
+    font-size: min(var(--cms-hero-mobile, 40px), 36px) !important;
+  }
+
+  main > section.story-section,
+  main > section#beneficios,
+  main > section#asi-se-vive,
+  main > section#seguridad,
+  main > section#comercios {
+    padding-top: 48px !important;
+    padding-bottom: 48px !important;
+  }
 }
 
 main h2 {

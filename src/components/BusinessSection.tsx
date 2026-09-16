@@ -18,7 +18,7 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider">
             <Store className="w-4 h-4 text-[#18B68B]" />
             <span>{section.badge}</span>
@@ -34,8 +34,8 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         </div>
 
         {/* Local business image + key benefits */}
-        <div className="mb-16 grid grid-cols-1 gap-6 lg:grid-cols-[0.95fr_1.25fr]">
-          <figure className="relative min-h-[340px] overflow-hidden rounded-3xl lg:min-h-[430px]">
+        <div className="mb-10 sm:mb-16 grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[0.95fr_1.25fr]">
+          <figure className="relative min-h-[240px] overflow-hidden rounded-3xl sm:min-h-[340px] lg:min-h-[430px]">
             <img src={section.imageUrl} alt={section.imageAlt} className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
             <figcaption className="absolute bottom-0 left-0 p-6 text-lg font-extrabold text-white sm:p-8">
@@ -43,12 +43,12 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
             </figcaption>
           </figure>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {section.features.map((feature, index) => {
               const Icon = featureIcons[index % featureIcons.length];
               return (
-                <div key={`${feature.title}-${index}`} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#18B68B] flex items-center justify-center font-bold mb-4"><Icon className="w-5 h-5" /></div>
+                <div key={`${feature.title}-${index}`} className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-[#18B68B] transition-all">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 text-[#18B68B] flex items-center justify-center font-bold mb-3 sm:mb-4"><Icon className="w-5 h-5" /></div>
                   <h3 className="font-bold text-slate-900 text-base mb-1.5">{feature.title}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
                 </div>
@@ -58,14 +58,14 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         </div>
 
         {/* Dynamic Local Business Cards */}
-        <div className="mb-12">
-          <h3 className="text-xl font-bold text-slate-900 text-center mb-6">
+        <div className="mb-8 sm:mb-12">
+          <h3 className="text-xl font-bold text-slate-900 text-center mb-4 sm:mb-6">
             {section.profilesTitle}
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
             {businesses.map(biz => (
-              <div key={biz.id} className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-start gap-4">
+              <div key={biz.id} className="basis-[82vw] shrink-0 snap-start bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm flex items-start gap-4 md:basis-auto">
                 <img 
                   loading="lazy"
                   decoding="async"
@@ -95,7 +95,7 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
         </div>
 
         {/* Action Callout Card */}
-        <div className="mt-12 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 rounded-3xl p-6 sm:p-8 lg:p-10 border border-emerald-100 shadow-sm w-full text-center space-y-5">
+        <div className="mt-8 sm:mt-12 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/40 rounded-3xl p-5 sm:p-8 lg:p-10 border border-emerald-100 shadow-sm w-full text-center space-y-5">
           <div className="space-y-2">
             <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 leading-snug">
               {section.actionTitle}

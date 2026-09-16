@@ -43,7 +43,7 @@ export const INITIAL_POSTS: NeighborhoodPost[] = [
     likes: 12,
     commentsCount: 4,
     tags: ['Herramientas', 'Jardín'],
-    image: 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=600&q=80',
+    image: '/landing-media/barrio-comunidad.jpg',
   },
   {
     id: 'post-2',
