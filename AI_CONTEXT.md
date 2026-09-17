@@ -243,3 +243,19 @@ Archivos centrales:
 - Producción verificada HTTP 200 para raíz, JS y CSS.
 - `site-content.json` conservó SHA-256 `c44ae40e77b9ff2b277da0bd756abf4b5fccd91ed0e6930c3c743ff52b0bc22a` antes/después.
 - Inventario de medios permaneció en 8 archivos. Backend/CMS no se reinició ni reemplazó.
+
+## Cierre móvil Beneficios + Escudo de Confianza — 17 de septiembre de 2026
+
+- Commit funcional publicado: `64eb3fa` (`feat: cerrar beneficios y confianza movil`).
+- Cambios incluidos: rediseño móvil de Beneficios bajo 640 px con tabs/swipe, nueva presentación móvil de Escudo de Confianza y botón flotante para volver arriba.
+- Desktop/tablet se mantuvieron sin cambios estructurales en estas secciones.
+- Producción publicada en `https://elbarrio.lat/` el 17/09/2026.
+- Backup frontend/CMS previo: `/var/www/vhosts/elbarrio.lat/private/deploy-backups/20260917-113727/`.
+- Copia local de seguridad: `/Users/fenha/Desktop/elbarrio-deploy-backups/20260917-113727/`.
+- Bundles publicados: `assets/index-DPNNe8hE.js` y `assets/index-B3GIlMLE.css`.
+- Producción verificada HTTP 200 para raíz, JS y CSS.
+- Hashes remotos de `index.html`, JS y CSS coinciden con el build local.
+- `site-content.json` conservó SHA-256 `c44ae40e77b9ff2b277da0bd756abf4b5fccd91ed0e6930c3c743ff52b0bc22a` antes/después.
+- Inventario CMS permaneció en 8 archivos dentro de `private/landing-data/media`.
+- Backend/CMS no se reinició ni reemplazó.
+- Producción se publicó copiando assets primero e `index.html` al final; no se usó `--delete`.
