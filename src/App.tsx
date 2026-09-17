@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { NeighborhoodStory } from './components/NeighborhoodStory';
@@ -22,6 +23,7 @@ export default function App() {
 function LandingPage() {
   const { content } = useSiteContent();
   const [selectedRole, setSelectedRole] = useState<RegistrationType>('vecino');
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const adminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
 
   useEffect(() => {
@@ -60,6 +62,18 @@ function LandingPage() {
     const interval = window.setInterval(sendHeartbeat, 60000);
     return () => { window.clearInterval(interval); window.removeEventListener('load', startHeartbeat); };
   }, [adminRoute]);
+
+  useEffect(() => {
+    if (adminRoute) return;
+    const updateScrollTopVisibility = () => setShowScrollTop(window.scrollY > 700);
+    updateScrollTopVisibility();
+    window.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
+    return () => window.removeEventListener('scroll', updateScrollTopVisibility);
+  }, [adminRoute]);
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleScrollToSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
@@ -112,6 +126,18 @@ function LandingPage() {
 
         {/* 10. Footer */}
         {content.layout.footerVisible && <Footer />}
+
+        {showScrollTop && (
+          <button
+            type="button"
+            onClick={handleScrollToTop}
+            aria-label="Volver arriba"
+            title="Volver arriba"
+            className="fixed bottom-5 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[#18B68B] text-white shadow-[0_10px_28px_rgba(15,23,42,0.22)] ring-1 ring-white/70 transition hover:bg-[#0E8067] active:scale-95 sm:bottom-6 sm:right-6"
+          >
+            <ArrowUp className="h-5 w-5 stroke-[2.5]" />
+          </button>
+        )}
 
       </div>
   );
