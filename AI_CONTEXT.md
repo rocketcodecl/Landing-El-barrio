@@ -259,3 +259,17 @@ Archivos centrales:
 - Inventario CMS permaneció en 8 archivos dentro de `private/landing-data/media`.
 - Backend/CMS no se reinició ni reemplazó.
 - Producción se publicó copiando assets primero e `index.html` al final; no se usó `--delete`.
+
+## Checkpoint previo al rediseño 1:1 basado en AI Studio — 17 de septiembre de 2026
+
+- Punto de partida aprobado/publicado antes del rediseño: `cdbae2f` en `codex/design-review-20260825`.
+- Se descartaron las pruebas locales no aprobadas de `BusinessSection.tsx`; el repo quedó limpio antes de marcar este checkpoint.
+- Nueva referencia maestra de diseño: landing del usuario en AI Studio (`ais-pre-5nozbgvh7hlizfxm4tliqd-331265398129.us-east1.run.app`).
+- Objetivo: reconstruir la experiencia móvil siguiendo esa referencia de forma muy fiel, no solo una sección aislada.
+- Excluir del nuevo flujo las secciones `Despliegue Territorial` y `Voz Comunitaria`.
+- Hero: adoptar la composición del demo, usando el video y poster locales actuales en lugar de una imagen estática.
+- Formulario: conservar exactamente el contrato funcional actual (campos, roles, submit, backend y recepción en `/admin/`), pero presentarlo dentro de un modal.
+- CTA flotante: mantener disponible una acción persistente para abrir el modal desde cualquier punto de la landing.
+- CMS: conservar las claves/campos actuales y usar el nuevo diseño solo como capa de presentación; no renombrar ni eliminar contratos de datos sin migración explícita.
+- Backend, `/admin/`, `private/landing-data` y producción quedan fuera del rediseño visual hasta aprobación explícita.
+- Todo el trabajo del rediseño se revisará primero en `https://elbarrio.lat/preview-launch-20260916/`.
