@@ -1,5 +1,6 @@
 import { Store, MapPin, Tag, MessageSquare, ArrowRight, Star, TrendingUp, CheckCircle } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
+import { BUSINESS_PORTAL_URL } from '../lib/landingRuntime';
 
 interface BusinessProps {
   onSelectRole: (role: 'comercio' | 'servicio') => void;
@@ -11,7 +12,7 @@ export function BusinessSection({ onSelectRole, onScrollToForm }: BusinessProps)
   const businesses = content.businesses || [];
   const section = content.businessSection;
   const featureIcons = [MapPin, Tag, MessageSquare, TrendingUp];
-  const openBusinessPortal = () => window.location.assign('https://negocios.elbarrio.lat/');
+  const openBusinessPortal = () => window.location.assign(BUSINESS_PORTAL_URL);
 
   return (
     <section id="comercios" className="relative overflow-hidden border-b border-emerald-900/10 bg-white py-20">

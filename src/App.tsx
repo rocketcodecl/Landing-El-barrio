@@ -13,8 +13,11 @@ import { WaitlistFormSection } from './components/WaitlistFormSection';
 import { Footer } from './components/Footer';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { SiteRuntimeSettings } from './components/SiteRuntimeSettings';
+import { MobileLandingOneToOne } from './components/MobileLandingOneToOne';
+import { MobileWaitlistModal } from './components/MobileWaitlistModal';
 import { SiteContentProvider, useSiteContent } from './context/SiteContentContext';
 import { RegistrationType } from './types';
+import { isLandingPreviewPath } from './lib/landingRuntime';
 
 export default function App() {
   return <SiteContentProvider><LandingPage /></SiteContentProvider>;
@@ -24,10 +27,12 @@ function LandingPage() {
   const { content } = useSiteContent();
   const [selectedRole, setSelectedRole] = useState<RegistrationType>('vecino');
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 639px)').matches);
+  const [waitlistModalOpen, setWaitlistModalOpen] = useState(false);
   const adminRoute = window.location.pathname === '/admin' || window.location.pathname === '/admin/';
 
   useEffect(() => {
-    if (adminRoute) return;
+    if (adminRoute || isLandingPreviewPath()) return;
     const storageKey = 'elbarrio_visitor_session';
     let sessionId = localStorage.getItem(storageKey);
     if (!sessionId) {
@@ -61,6 +66,15 @@ function LandingPage() {
     else window.addEventListener('load', startHeartbeat, { once: true });
     const interval = window.setInterval(sendHeartbeat, 60000);
     return () => { window.clearInterval(interval); window.removeEventListener('load', startHeartbeat); };
+  }, [adminRoute]);
+
+  useEffect(() => {
+    if (adminRoute) return;
+    const media = window.matchMedia('(max-width: 639px)');
+    const updateMobile = () => setIsMobile(media.matches);
+    updateMobile();
+    media.addEventListener('change', updateMobile);
+    return () => media.removeEventListener('change', updateMobile);
   }, [adminRoute]);
 
   useEffect(() => {
@@ -101,6 +115,24 @@ function LandingPage() {
       <div className="min-h-screen bg-slate-950 font-sans">
         <SiteRuntimeSettings includeCustomCss={false} />
         <AdminPanelModal defaultTab="cms" onClose={() => window.location.assign('/')} />
+      </div>
+    );
+  }
+
+  const openMobileWaitlist = (role?: RegistrationType) => {
+    if (role) setSelectedRole(role);
+    setWaitlistModalOpen(true);
+  };
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-white font-sans">
+        <SiteRuntimeSettings />
+        <MobileLandingOneToOne onOpenWaitlist={openMobileWaitlist} />
+        <MobileWaitlistModal
+          isOpen={waitlistModalOpen}
+          onClose={() => setWaitlistModalOpen(false)}
+        />
       </div>
     );
   }

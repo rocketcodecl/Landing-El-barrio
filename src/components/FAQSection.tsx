@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { ArrowUpRight, ChevronDown, HelpCircle, MessageCircle, ShieldCheck, Store } from 'lucide-react';
 import { FAQCategory } from '../types';
 import { useSiteContent } from '../context/SiteContentContext';
+import { OFFICIAL_WHATSAPP_DIGITS } from '../lib/landingRuntime';
 
 type CategoryFilter = FAQCategory | 'all';
 
 export function FAQSection() {
   const { content } = useSiteContent();
   const faqs = content.faqs || [];
-  const configuredWhatsapp = (content.branding?.supportWhatsapp || '+56935304705').replace(/[^0-9]/g, '');
-  const supportWhatsapp = configuredWhatsapp === '56912345678' ? '56935304705' : configuredWhatsapp;
+  const supportWhatsapp = OFFICIAL_WHATSAPP_DIGITS;
   const whatsappMessage = encodeURIComponent('Hola, tengo una consulta sobre El Barrio.');
   const section = content.faqSection;
   const categoryLabels: Record<FAQCategory, string> = {

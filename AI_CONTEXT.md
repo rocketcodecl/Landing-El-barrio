@@ -1,6 +1,6 @@
 # AI Context — Landing pública de El Barrio
 
-Última actualización: 9 de septiembre de 2026.
+Última actualización: 10 de octubre de 2026.
 
 Este documento entrega continuidad a cualquier nuevo chat o agente que trabaje en la landing. El código vigente tiene prioridad si algo de este archivo queda desactualizado.
 
@@ -273,3 +273,55 @@ Archivos centrales:
 - CMS: conservar las claves/campos actuales y usar el nuevo diseño solo como capa de presentación; no renombrar ni eliminar contratos de datos sin migración explícita.
 - Backend, `/admin/`, `private/landing-data` y producción quedan fuera del rediseño visual hasta aprobación explícita.
 - Todo el trabajo del rediseño se revisará primero en `https://elbarrio.lat/preview-launch-20260916/`.
+
+## Verificación de ecosistema — 8 de octubre de 2026
+
+- La fuente local vigente continúa siendo esta carpeta en la rama `codex/design-review-20260825`.
+- Producción sigue en `https://elbarrio.lat/`.
+- El stage sigue en `https://elbarrio.lat/preview-launch-20260916/` y corresponde exactamente al trabajo local actual al 08-10-2026.
+- Verificación reproducible del stage: build local con `--base=/preview-launch-20260916/` produjo los mismos hashes que Plesk:
+  - `index.html`: `6f96fafd17c7c5d630b0d35d818c231ac3bb4696c54351561ed7840cadc8b78d`
+  - JS `index-QD9-CJsK.js`: `9e11199e32cd418f6484d038aaccc28ca3f0eb757e598fe7858c7e5058efb3d5`
+  - CSS `index-BLZqsBRl.css`: `84d80f8cefd7f113c8e01607d699eace8a72752df67c1b6b441fc2f456593481`
+- El CMS que realmente controla el contenido vivo de producción es `https://elbarrio.lat/admin/`.
+- El backend Node vivo está en `/var/www/vhosts/elbarrio.lat/landing-backend`.
+- Los datos vivos del CMS están en `/var/www/vhosts/elbarrio.lat/private/landing-data`.
+- `cms.elbarrio.lat` y `land.elbarrio.lat` fueron retirados de Plesk y DNS el 9 de octubre de 2026, con backup previo registrado en el contexto global.
+- No volver a tratarlos como superficies activas ni como fuentes de contenido.
+- El mapa global del ecosistema se mantiene en `ECOSYSTEM_CONTEXT.md` del repositorio principal `rocketcodecl/elbarrio`.
+
+### Trabajo local pendiente
+
+Al 08-10-2026 existen cambios locales sin commit que deben preservarse:
+
+- `src/App.tsx`
+- `src/components/MobileLandingOneToOne.tsx`
+- `src/components/MobileWaitlistModal.tsx`
+- nuevos assets en `public/brand/`
+- nuevas imágenes en `public/landing-media/`
+
+No hacer reset, checkout destructivo, clean ni rebase que pueda eliminar este trabajo.
+No afirmar que estos cambios están publicados hasta comparar explícitamente el stage, compilar y verificar producción.
+
+
+## Coherencia editorial desktop/móvil — 10 de octubre de 2026
+
+- Punto de retorno previo al bloque: /Users/fenha/Desktop/elbarrio-deploy-backups/landing-coherence-pre-20261010-150715.
+- El respaldo incluye worktree local, diff/estado Git y copia completa del stage remoto.
+- La matriz canónica vive en LANDING_CONTENT_COHERENCE.md.
+- Desktop y móvil pueden conservar composiciones distintas, pero ambos deben consumir el mismo SiteContent.
+- El rediseño móvil dejó de mantener títulos, promesas y CTA de producto paralelos cuando ya existe un campo equivalente en CMS.
+- El móvil respeta la visibilidad de content.layout.sections.
+- CTA de comercios/servicios usa el Portal de Negocios; la lista de espera de Landing queda orientada a vecinos.
+- Destinos operativos estables se centralizan en src/lib/landingRuntime.ts.
+- El stage continúa leyendo el CMS vivo, pero queda diseñado como preview sin escrituras:
+  - no registra analytics/heartbeat;
+  - no persiste envíos de lista de espera;
+  - no guarda cambios de SiteContent.
+- No se modificó contenido vivo del CMS ni producción durante este bloque.
+- Sigue pendiente una decisión editorial posterior sobre reemplazar lenguaje histórico de “cuadrante” por barrio/sector/territorio/Unidad Vecinal en contenido vivo.
+
+- QA posterior al despliegue del stage: móvil 390 px y desktop 1440 px verdes, sin errores de consola ni HTTP.
+- Verificación de aislamiento: waitlist.json, visits.json y site-content.json conservaron sus SHA-256 antes/después del QA.
+- Stage publicado con index e0be967356a4fab50c0e9451c3cab11b75ff9333e20f6d80f58fe43dd8afe3b1, JS ab086318010bb23332b218352763719da515ab02443ff9e9c5f24b42532d9ab6 y CSS 9a892ea0d84fc00dd8bd6622e7fc5854a3f2a5f16758c7db795daa6c663cc037.
+- Producción quedó intacta con assets index-DPNNe8hE.js / index-B3GIlMLE.css.

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, X, ShieldCheck, ArrowRight, Store, Users } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { useSiteContent } from '../context/SiteContentContext';
+import { BUSINESS_PORTAL_URL } from '../lib/landingRuntime';
 
 interface HeaderProps {
   onScrollToSection: (sectionId: string) => void;
@@ -173,7 +174,7 @@ export function Header({ onScrollToSection, onSelectRoleForm }: HeaderProps) {
             </button>
 
             <button
-              onClick={() => window.location.assign('https://negocios.elbarrio.lat/')}
+              onClick={() => window.location.assign(BUSINESS_PORTAL_URL)}
               className="w-full bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2"
             >
               <Store className="w-4 h-4 text-[#18B68B]" />

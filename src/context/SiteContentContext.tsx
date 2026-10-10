@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { FAQItem, LocalBusiness, NeighborhoodPost, SiteContent } from '../types';
 import { DEFAULT_SITE_CONTENT } from '../data/defaultSiteContent';
+import { isLandingPreviewPath } from '../lib/landingRuntime';
 
 interface SiteContentContextType {
   content: SiteContent;
@@ -86,6 +87,11 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!remoteReadyRef.current) return;
+    if (isLandingPreviewPath()) {
+      setSaveStatus('idle');
+      setSaveError(null);
+      return;
+    }
     const serialized = JSON.stringify(content);
     if (serialized === lastRemoteContentRef.current) return;
     setSaveStatus('saving');

@@ -1,5 +1,6 @@
 import { Target, Eye, Sparkles, MapPin } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
+import { BUSINESS_PORTAL_URL } from '../lib/landingRuntime';
 
 interface LocalAdSectionProps {
   onSelectRole: (role: 'comercio' | 'servicio') => void;
@@ -80,7 +81,7 @@ export function LocalAdSection({ onSelectRole, onScrollToForm }: LocalAdSectionP
                   />
                 )}
                 <button
-                  onClick={() => window.location.assign('https://negocios.elbarrio.lat/')}
+                  onClick={() => window.location.assign(BUSINESS_PORTAL_URL)}
                   className="w-full bg-[#18B68B] hover:bg-[#15a27c] text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition-all text-sm cursor-pointer text-center"
                 >
                   {buttonText}

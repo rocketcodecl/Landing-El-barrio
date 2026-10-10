@@ -3,6 +3,7 @@ import { CHILEAN_COMMUNES } from '../data/mockData';
 import { RegistrationType } from '../types';
 import { Users, Store, Wrench, ArrowRight, CheckCircle2, Sparkles, Share2, Copy, Check, MapPin, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
+import { BUSINESS_PORTAL_URL, isLandingPreviewPath } from '../lib/landingRuntime';
 
 interface WaitlistFormProps {
   selectedRole: RegistrationType;
@@ -28,6 +29,7 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
     btnServicio: 'Registrar mi servicio profesional'
   };
   const ui = content.formUI;
+  const isPreview = isLandingPreviewPath();
 
   const quadrants = [
     { id: 'q-1', name: formContent.quadrant1Name || 'El Golf & Plaza Perú (Las Condes)', progress: formContent.quadrant1Progress || '92%' },
@@ -59,6 +61,13 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
     setSubmitError(null);
 
     const selectedCommune = comuna === 'Otra comuna' ? (otraComuna.trim() || 'Las Condes') : comuna;
+
+    if (isPreview) {
+      setReferralCode('');
+      setSubmitted(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/waitlist', {
@@ -172,12 +181,8 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
 
               <button
                 type="button"
-                onClick={() => onRoleChange('comercio')}
-                className={`py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  selectedRole === 'comercio'
-                    ? 'bg-slate-900 text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={() => window.location.assign(BUSINESS_PORTAL_URL)}
+                className="py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer text-slate-600 hover:bg-white hover:text-slate-900"
               >
                 <Store className="w-4 h-4" />
                 <span>{ui.roleBusiness}</span>
@@ -185,17 +190,19 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
 
               <button
                 type="button"
-                onClick={() => onRoleChange('servicio')}
-                className={`py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                  selectedRole === 'servicio'
-                    ? 'bg-teal-700 text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={() => window.location.assign(BUSINESS_PORTAL_URL)}
+                className="py-3 px-3 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer text-slate-600 hover:bg-white hover:text-slate-900"
               >
                 <Wrench className="w-4 h-4" />
                 <span>{ui.roleService}</span>
               </button>
             </div>
+
+            {isPreview && !submitted && (
+              <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold leading-5 text-amber-900">
+                Vista previa: puedes probar el formulario, pero los datos no se guardarán ni afectarán las métricas de producción.
+              </div>
+            )}
 
             {!submitted ? (
               /* Registration Form */
@@ -369,41 +376,47 @@ export function WaitlistFormSection({ selectedRole, onRoleChange }: WaitlistForm
                     {ui.successTitle.replace('{nombre}', nombre.split(' ')[0] || nombre)}
                   </h3>
                   <p className="text-slate-600 text-base leading-relaxed max-w-lg mx-auto">
-                    {ui.successMessage.replace('{comuna}', comuna === 'Otra comuna' ? otraComuna : comuna).replace('{rol}', selectedRole)}
+                    {isPreview
+                      ? 'Prueba completada. Esta inscripción no fue guardada porque estás en el entorno de revisión.'
+                      : ui.successMessage.replace('{comuna}', comuna === 'Otra comuna' ? otraComuna : comuna).replace('{rol}', selectedRole)}
                   </p>
                 </div>
 
-                <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 text-sm text-emerald-900 font-medium space-y-2 max-w-lg mx-auto">
-                  <p>
-                    {ui.savedText}{referralCode && <> Tu código de invitación es <strong>{referralCode}</strong>.</>}
-                  </p>
-                </div>
+                {!isPreview && (
+                  <>
+                    <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 text-sm text-emerald-900 font-medium space-y-2 max-w-lg mx-auto">
+                      <p>
+                        {ui.savedText}{referralCode && <> Tu código de invitación es <strong>{referralCode}</strong>.</>}
+                      </p>
+                    </div>
 
-                {/* Share & Viral Loop */}
-                <div className="pt-6 border-t border-slate-100 space-y-4 max-w-lg mx-auto">
-                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    {ui.shareEyebrow}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {ui.shareText}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button
-                      onClick={handleShareWhatsApp}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      <span>{ui.shareWhatsapp}</span>
-                    </button>
-                    <button
-                      onClick={handleCopyLink}
-                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
-                    >
-                      {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                      <span>{copiedLink ? ui.copiedLink : ui.copyLink}</span>
-                    </button>
-                  </div>
-                </div>
+                    {/* Share & Viral Loop */}
+                    <div className="pt-6 border-t border-slate-100 space-y-4 max-w-lg mx-auto">
+                      <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        {ui.shareEyebrow}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {ui.shareText}
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                          onClick={handleShareWhatsApp}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
+                        >
+                          <Share2 className="w-4 h-4" />
+                          <span>{ui.shareWhatsapp}</span>
+                        </button>
+                        <button
+                          onClick={handleCopyLink}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+                        >
+                          {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                          <span>{copiedLink ? ui.copiedLink : ui.copyLink}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
               </div>
             )}
