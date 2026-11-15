@@ -94,9 +94,12 @@ function sanitizeText(value, max = 500) {
 }
 
 function normalizeWhatsapp(value) {
-  const digits = sanitizeText(value, 30).replace(/\D/g, '');
-  if (!digits) return null;
-  return digits.startsWith('56') ? `+${digits}` : `+56${digits}`;
+  const raw = sanitizeText(value, 30);
+  const digits = raw.replace(/\D/g, '');
+  if (/^9\d{8}$/.test(digits)) return '+56' + digits;
+  if (/^56\d{9}$/.test(digits)) return '+' + digits;
+  if (raw.startsWith('+') && /^\d{8,15}$/.test(digits)) return '+' + digits;
+  return null;
 }
 
 function referralCode(entries) {
@@ -208,6 +211,84 @@ app.delete('/api/media/:name', requireAdmin, async (req, res) => {
   }
 });
 
+// Sincronización directa Contabo -> Supabase, sin dependencia de Vercel.
+// El servidor guarda primero y reintenta cualquier réplica pendiente.
+const SUPABASE_PROJECT_URL = process.env.SUPABASE_PROJECT_URL;
+const SUPABASE_PUBLIC_KEY = process.env.SUPABASE_PUBLIC_KEY;
+const CONTABO_BRIDGE_TOKEN = process.env.CONTABO_BRIDGE_TOKEN;
+if (!SUPABASE_PROJECT_URL?.startsWith('https://') ||
+    !SUPABASE_PUBLIC_KEY?.startsWith('sb_publishable_') ||
+    !CONTABO_BRIDGE_TOKEN) {
+  throw new Error('Configuración de réplica Contabo -> Supabase incompleta');
+}
+const MIRROR_RPC_URL = SUPABASE_PROJECT_URL + '/rest/v1/rpc/mirror_landing_registration_contabo';
+
+// Serializar todas las escrituras al archivo JSON para evitar inscripciones perdidas.
+let waitlistTail = Promise.resolve();
+function queueWaitlistWrite(action) {
+  const work = waitlistTail.then(action, action);
+  waitlistTail = work.catch(() => undefined);
+  return work;
+}
+let syncBusy = false;
+
+async function mirrorRegistration(entry) {
+  const response = await fetch(MIRROR_RPC_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_PUBLIC_KEY,
+    },
+    body: JSON.stringify({
+      p_token: CONTABO_BRIDGE_TOKEN,
+      p_payload: {
+        participantType: entry.participantType,
+        nombre: entry.nombre,
+        correo: entry.correo,
+        whatsapp: entry.whatsapp,
+        comuna: entry.comuna,
+        nombreNegocio: entry.nombreNegocio,
+        rubro: entry.rubro,
+      },
+    }),
+    signal: AbortSignal.timeout(9000),
+  });
+  if (!response.ok) throw new Error('Supabase RPC HTTP ' + response.status);
+  const id = await response.json();
+  if (typeof id !== 'string' || !/^[a-f0-9-]{36}$/i.test(id)) throw new Error('Respuesta inesperada del RPC');
+}
+
+async function syncPendingRegistrations() {
+  if (syncBusy) return;
+  syncBusy = true;
+  try {
+    const items = await readJson('waitlist.json', []);
+    const pending = items.filter((entry) => entry.mirrorStatus === 'pending').slice(0, 25);
+    for (const entry of pending) {
+      try {
+        await mirrorRegistration(entry);
+        await queueWaitlistWrite(async () => {
+          const current = await readJson('waitlist.json', []);
+          const found = current.find((item) => item.id === entry.id && item.mirrorStatus === 'pending');
+          if (!found) return;
+          found.mirrorStatus = 'synced';
+          found.mirroredAt = new Date().toISOString();
+          await writeJson('waitlist.json', current);
+        });
+      } catch (error) {
+        // No registrar nombres, correo, WhatsApp ni payloads.
+        console.error('[landing-mirror] Réplica pendiente:', error?.name || 'Error');
+        break;
+      }
+    }
+  } finally {
+    syncBusy = false;
+  }
+}
+
+setTimeout(() => void syncPendingRegistrations(), 5000).unref();
+setInterval(() => void syncPendingRegistrations(), 60000).unref();
+
 app.post('/api/waitlist', async (req, res) => {
   const participantType = sanitizeText(req.body?.participantType ?? req.body?.tipo_registro, 20);
   const nombre = sanitizeText(req.body?.nombre, 160);
@@ -218,28 +299,43 @@ app.post('/api/waitlist', async (req, res) => {
   if (!['vecino', 'comercio', 'servicio'].includes(participantType)) return res.status(400).json({ error: 'Tipo de registro inválido' });
   if (!nombre || !correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) return res.status(400).json({ error: 'Nombre y correo válido son requeridos' });
   if (!comuna) return res.status(400).json({ error: 'La comuna es requerida' });
+  const whatsapp = normalizeWhatsapp(req.body?.whatsapp);
+  if (!whatsapp) return res.status(400).json({ error: 'Ingresa un WhatsApp válido. Es obligatorio.' });
   if (participantType === 'comercio' && (!nombreNegocio || !rubro)) return res.status(400).json({ error: 'Nombre y rubro del comercio son requeridos' });
   if (participantType === 'servicio' && !rubro) return res.status(400).json({ error: 'El servicio u oficio es requerido' });
 
-  const entries = await readJson('waitlist.json', []);
-  if (entries.some((entry) => String(entry.correo).toLowerCase() === correo)) {
+  const result = await queueWaitlistWrite(async () => {
+    const entries = await readJson('waitlist.json', []);
+    if (entries.some((entry) => String(entry.correo).toLowerCase() === correo)) {
+      return { duplicate: true };
+    }
+    const entry = {
+      id: randomBytes(12).toString('hex'),
+      participantType,
+      nombre,
+      correo,
+      whatsapp,
+      comuna,
+      nombreNegocio: nombreNegocio || null,
+      rubro: rubro || null,
+      referralCode: referralCode(entries),
+      createdAt: new Date().toISOString(),
+      mirrorStatus: 'pending',
+    };
+    entries.push(entry);
+    await writeJson('waitlist.json', entries);
+    return { entry, position: entries.length };
+  });
+
+  if (result.duplicate) {
     return res.status(409).json({ error: 'Ya existe una inscripción con ese correo', duplicate: true });
   }
-  const entry = {
-    id: randomBytes(12).toString('hex'),
-    participantType,
-    nombre,
-    correo,
-    whatsapp: normalizeWhatsapp(req.body?.whatsapp),
-    comuna,
-    nombreNegocio: nombreNegocio || null,
-    rubro: rubro || null,
-    referralCode: referralCode(entries),
-    createdAt: new Date().toISOString(),
-  };
-  entries.push(entry);
-  await writeJson('waitlist.json', entries);
-  res.status(201).json({ success: true, id: entry.id, referralCode: entry.referralCode, position: entries.length });
+  res.status(201).json({
+    success: true, id: result.entry.id,
+    referralCode: result.entry.referralCode, position: result.position,
+  });
+  // Confirmar inscripción desde almacenamiento local; sincronización recuperable.
+  void syncPendingRegistrations();
 });
 
 app.get('/api/waitlist', requireAdmin, async (req, res) => {
@@ -253,10 +349,14 @@ app.get('/api/waitlist', requireAdmin, async (req, res) => {
 });
 
 app.delete('/api/waitlist/:id', requireAdmin, async (req, res) => {
-  const entries = await readJson('waitlist.json', []);
-  const next = entries.filter((entry) => entry.id !== req.params.id);
-  if (next.length === entries.length) return res.status(404).json({ error: 'Registro no encontrado' });
-  await writeJson('waitlist.json', next);
+  const removed = await queueWaitlistWrite(async () => {
+    const entries = await readJson('waitlist.json', []);
+    const next = entries.filter((entry) => entry.id !== req.params.id);
+    if (next.length === entries.length) return false;
+    await writeJson('waitlist.json', next);
+    return true;
+  });
+  if (!removed) return res.status(404).json({ error: 'Registro no encontrado' });
   res.json({ success: true });
 });
 
