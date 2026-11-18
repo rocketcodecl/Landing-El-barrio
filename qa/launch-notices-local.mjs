@@ -25,7 +25,7 @@ await writeFile(mock,[
  "const body=JSON.parse(init.body||'{}');",
  "if(body.p_token!=='qa-token')return new Response('{}',{status:403});",
  "const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222';",
- "const states=body.p_ids.filter(id=>id===a||id===b).map(id=>({neighborhoodId:id,uvCode:id===a?'024':'016',comuna:'LAS CONDES',launchStatus:id===a?'active':'draft',isActive:true,eligible:id===a}));",
+ "const states=body.p_ids.filter(id=>id===a||id===b).map(id=>({neighborhoodId:id,uvCode:id===a?'024':'016',comuna:'LAS CONDES',uvName:id===a?'UV Activa':'El Barrio',launchStatus:id===a?'active':'draft',isActive:true,eligible:id===a}));",
  "return new Response(JSON.stringify(states),{status:200,headers:{'Content-Type':'application/json'}});",
  "};"
 ].join('\n'));
@@ -53,6 +53,7 @@ try{
  assert(list.status===200,'GET failed');
  assert(list.body.summary.total===3&&list.body.summary.eligible===1&&list.body.summary.withoutUv===1,'Counts wrong');
  assert(list.body.rows.find(x=>x.id===ids[1]).canPrepare===false,'Draft eligible by mistake');
+ assert(list.body.rows.find(x=>x.id===ids[1]).uvName==='El Barrio','Beta community label missing');
  assert((await post(ids[1],'prepare')).status===409,'Draft not blocked');
  assert((await post(ids[2],'prepare')).status===409,'Unmapped not blocked');
  assert((await post(ids[0],'confirm',{confirmation:'MENSAJE_ENVIADO'})).status===409,'Unprepared confirmed');

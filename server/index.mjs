@@ -457,6 +457,7 @@ async function launchStateForIds(ids) {
       if (!group.includes(item?.neighborhoodId)) continue;
       states.set(item.neighborhoodId, {
         uvCode: sanitizeText(item.uvCode, 80),
+        uvName: sanitizeText(item.uvName, 120),
         comuna: sanitizeText(item.comuna, 120),
         launchStatus: sanitizeText(item.launchStatus, 30),
         // Las dos condiciones deben cumplirse simultáneamente.
@@ -496,6 +497,7 @@ function publicNoticeRow(entry, uv, history) {
     comuna: sanitizeText(entry.comuna, 120),
     type: sanitizeText(entry.participantType, 20),
     uvCode: mapped ? (uv?.uvCode || sanitizeText(entry.uvCode, 80)) : null,
+    uvName: mapped ? (uv?.uvName || sanitizeText(entry.uvName, 120)) : null,
     neighborhoodId: mapped ? entry.neighborhoodId : null,
     launchStatus: !mapped ? 'sin_uv' : (uv?.launchStatus || 'sin_estado'),
     eligible,
