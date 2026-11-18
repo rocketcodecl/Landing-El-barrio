@@ -401,6 +401,217 @@ app.post('/api/waitlist', async (req, res) => {
   void syncPendingRegistrations();
 });
 
+
+// Avisos de lanzamiento por UV: flujo MANUAL y auditado.
+// La lectura de estados territoriales se consulta en Supabase usando el token
+// privado del puente. No se notifican UV en borrador, piloto o pausa.
+const NOTICE_UV_RPC_URL = SUPABASE_PROJECT_URL + '/rest/v1/rpc/landing_notice_uv_states_contabo';
+const NOTICE_APP_STORE = 'https://apps.apple.com/cl/app/el-barrio/id6828169099';
+const NOTICE_GOOGLE_PLAY = 'https://play.google.com/store/apps/details?id=lat.elbarrio.app';
+const NOTICE_ENTRY_ID_PATTERN = /^[a-f0-9]{24}$/i;
+const NOTICE_UUID_PATTERN = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+let noticesTail = Promise.resolve();
+
+function queueNoticesWrite(action) {
+  const work = noticesTail.then(action, action);
+  noticesTail = work.catch(() => undefined);
+  return work;
+}
+
+function currentAdminUsername(req) {
+  // requireAdmin already verified the HMAC signature and user existence.
+  return sanitizeText(cookies(req)[SESSION_COOKIE]?.split('|')[0], 100);
+}
+
+function requireAdminSameOrigin(req, res, next) {
+  const origin = req.headers.origin;
+  if (origin && !['https://elbarrio.lat', 'https://www.elbarrio.lat'].includes(origin)) {
+    return res.status(403).json({ error: 'Origen no autorizado.' });
+  }
+  next();
+}
+
+async function readNoticeAudit() {
+  const audit = await readJson('launch-notices.json', {});
+  if (!audit || typeof audit !== 'object' || Array.isArray(audit)) {
+    throw new Error('Estado de avisos inválido.');
+  }
+  return audit;
+}
+
+async function launchStateForIds(ids) {
+  const keys = [...new Set(ids.filter(id => typeof id === 'string' && NOTICE_UUID_PATTERN.test(id)))];
+  const states = new Map();
+  for (let index = 0; index < keys.length; index += 150) {
+    const group = keys.slice(index, index + 150);
+    const response = await fetch(NOTICE_UV_RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SUPABASE_PUBLIC_KEY },
+      body: JSON.stringify({ p_token: CONTABO_BRIDGE_TOKEN, p_ids: group }),
+      signal: AbortSignal.timeout(9000),
+    });
+    if (!response.ok) throw new Error('Launch status RPC HTTP ' + response.status);
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error('Respuesta territorial inesperada.');
+    for (const item of rows) {
+      if (!group.includes(item?.neighborhoodId)) continue;
+      states.set(item.neighborhoodId, {
+        uvCode: sanitizeText(item.uvCode, 80),
+        comuna: sanitizeText(item.comuna, 120),
+        launchStatus: sanitizeText(item.launchStatus, 30),
+        // Las dos condiciones deben cumplirse simultáneamente.
+        eligible: item.launchStatus === 'active' && item.isActive === true && item.eligible === true,
+      });
+    }
+  }
+  return states;
+}
+
+function noticeMessage(entry) {
+  const firstName = sanitizeText(entry.nombre, 160).split(/\s+/)[0].slice(0, 60) || 'vecino';
+  const comuna = sanitizeText(entry.comuna, 120);
+  const where = comuna ? ' de ' + comuna : '';
+  return 'Hola ' + firstName + ', ¡tenemos una buena noticia!\n\n'
+    + '¡El Barrio ya está activo en tu sector' + where + '!\n\n'
+    + 'Ya puedes descargar la app para conectar con tus vecinos y descubrir comercios, servicios y novedades de tu barrio.\n\n'
+    + 'Descárgala directamente desde tu teléfono:\n'
+    + 'iPhone · App Store: ' + NOTICE_APP_STORE + '\n'
+    + 'Android · Google Play: ' + NOTICE_GOOGLE_PLAY + '\n\n'
+    + '¡Nos vemos en El Barrio!';
+}
+
+async function findNoticeRecipient(id) {
+  if (!NOTICE_ENTRY_ID_PATTERN.test(id)) return null;
+  const entries = await readJson('waitlist.json', []);
+  return entries.find(entry => entry.id === id) || null;
+}
+
+function publicNoticeRow(entry, uv, history) {
+  const mapped = !!entry.neighborhoodId && NOTICE_UUID_PATTERN.test(entry.neighborhoodId);
+  const eligible = mapped && uv?.eligible === true;
+  const sent = history?.status === 'sent';
+  return {
+    id: entry.id,
+    nombre: sanitizeText(entry.nombre, 160),
+    comuna: sanitizeText(entry.comuna, 120),
+    type: sanitizeText(entry.participantType, 20),
+    uvCode: mapped ? (uv?.uvCode || sanitizeText(entry.uvCode, 80)) : null,
+    neighborhoodId: mapped ? entry.neighborhoodId : null,
+    launchStatus: !mapped ? 'sin_uv' : (uv?.launchStatus || 'sin_estado'),
+    eligible,
+    status: sent ? 'sent' : history?.status === 'prepared' ? 'prepared' : 'pending',
+    preparedAt: history?.preparedAt || null,
+    sentAt: history?.sentAt || null,
+    canPrepare: eligible && !sent && !!normalizeWhatsapp(entry.whatsapp),
+  };
+}
+
+// Solo accesible con sesión administrativa existente. Nunca se exponen tokens.
+app.get('/api/launch-notices', requireAdmin, async (_req, res) => {
+  try {
+    const entries = await readJson('waitlist.json', []);
+    const [states, audit] = await Promise.all([
+      launchStateForIds(entries.map(entry => entry.neighborhoodId)),
+      readNoticeAudit(),
+    ]);
+    const rows = entries.map(entry => publicNoticeRow(
+      entry, states.get(entry.neighborhoodId), audit[entry.id],
+    ));
+    res.json({
+      rows,
+      summary: {
+        total: rows.length,
+        withoutUv: rows.filter(row => !row.neighborhoodId).length,
+        eligible: rows.filter(row => row.eligible && row.status !== 'sent').length,
+        sent: rows.filter(row => row.status === 'sent').length,
+        blocked: rows.filter(row => !row.eligible).length,
+      },
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('[launch-notices] No fue posible verificar estados:', error?.name || 'Error');
+    res.status(503).json({ error: 'No fue posible verificar el estado de las UV. Los avisos permanecen bloqueados.' });
+  }
+});
+
+// Preparar es distinto de enviar. Cada intento vuelve a consultar el estado
+// oficial en Supabase y registra solo que se preparó el enlace.
+app.post('/api/launch-notices/:id/prepare', requireAdmin, requireAdminSameOrigin, async (req, res) => {
+  try {
+    const entry = await findNoticeRecipient(req.params.id);
+    if (!entry) return res.status(404).json({ error: 'Inscripción no encontrada.' });
+    if (!entry.neighborhoodId || !NOTICE_UUID_PATTERN.test(entry.neighborhoodId)) {
+      return res.status(409).json({ error: 'Esta inscripción todavía no tiene una UV identificada.' });
+    }
+    const state = (await launchStateForIds([entry.neighborhoodId])).get(entry.neighborhoodId);
+    if (!state?.eligible) {
+      return res.status(409).json({ error: 'La UV no está habilitada para avisos de lanzamiento.' });
+    }
+    const phone = normalizeWhatsapp(entry.whatsapp)?.replace(/\D/g, '');
+    if (!phone) return res.status(409).json({ error: 'WhatsApp no válido.' });
+    const result = await queueNoticesWrite(async () => {
+      const audit = await readNoticeAudit();
+      const existing = audit[entry.id] || {};
+      if (existing.status === 'sent') return { alreadySent: true };
+      const now = new Date().toISOString();
+      audit[entry.id] = {
+        neighborhoodId: entry.neighborhoodId, status: 'prepared',
+        preparedAt: existing.preparedAt || now, lastPreparedAt: now,
+        attempts: Number(existing.attempts || 0) + 1, preparedBy: currentAdminUsername(req),
+      };
+      await writeJson('launch-notices.json', audit);
+      return { preparedAt: audit[entry.id].preparedAt };
+    });
+    if (result.alreadySent) return res.status(409).json({ error: 'Este inscrito ya figura como avisado.' });
+    res.json({
+      success: true,
+      status: 'prepared',
+      preparedAt: result.preparedAt,
+      // Abrir este enlace no confirma que el usuario recibió el mensaje.
+      whatsappUrl: 'https://wa.me/' + phone + '?text=' + encodeURIComponent(noticeMessage(entry)),
+    });
+  } catch (error) {
+    console.error('[launch-notices] Error preparando:', error?.name || 'Error');
+    res.status(503).json({ error: 'No se pudo verificar el lanzamiento. No se preparó el aviso.' });
+  }
+});
+
+// Registro explícito del operador una vez que REALMENTE pulsó Enviar en WhatsApp.
+// Nunca se infiere un envío a partir de abrir un enlace o una ventana.
+app.post('/api/launch-notices/:id/confirm', requireAdmin, requireAdminSameOrigin, async (req, res) => {
+  if (req.body?.confirmation !== 'MENSAJE_ENVIADO') {
+    return res.status(400).json({ error: 'Confirma explícitamente el envío manual.' });
+  }
+  try {
+    const entry = await findNoticeRecipient(req.params.id);
+    if (!entry?.neighborhoodId || !NOTICE_UUID_PATTERN.test(entry.neighborhoodId)) {
+      return res.status(409).json({ error: 'La inscripción no tiene UV identificada.' });
+    }
+    const state = (await launchStateForIds([entry.neighborhoodId])).get(entry.neighborhoodId);
+    if (!state?.eligible) {
+      return res.status(409).json({ error: 'La UV no está activa. No es posible confirmar un aviso.' });
+    }
+    const result = await queueNoticesWrite(async () => {
+      const audit = await readNoticeAudit();
+      const existing = audit[entry.id];
+      if (existing?.status === 'sent') return { alreadySent: true };
+      if (!existing || existing.status !== 'prepared' || existing.neighborhoodId !== entry.neighborhoodId) {
+        return { notPrepared: true };
+      }
+      const now = new Date().toISOString();
+      audit[entry.id] = { ...existing, status: 'sent', sentAt: now, sentBy: currentAdminUsername(req) };
+      await writeJson('launch-notices.json', audit);
+      return { sentAt: now };
+    });
+    if (result.alreadySent) return res.status(409).json({ error: 'El envío ya fue registrado.' });
+    if (result.notPrepared) return res.status(409).json({ error: 'Primero debes preparar el WhatsApp.' });
+    res.json({ success: true, status: 'sent', sentAt: result.sentAt });
+  } catch (error) {
+    console.error('[launch-notices] Error confirmando:', error?.name || 'Error');
+    res.status(503).json({ error: 'No fue posible validar la UV ni registrar el envío.' });
+  }
+});
+
 app.get('/api/waitlist', requireAdmin, async (req, res) => {
   const search = sanitizeText(req.query.search, 100).toLowerCase();
   const type = sanitizeText(req.query.type, 20);
