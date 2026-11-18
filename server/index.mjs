@@ -409,6 +409,7 @@ const NOTICE_UV_RPC_URL = SUPABASE_PROJECT_URL + '/rest/v1/rpc/landing_notice_uv
 const NOTICE_APP_STORE = 'https://apps.apple.com/cl/app/el-barrio/id6828169099';
 const NOTICE_GOOGLE_PLAY = 'https://play.google.com/store/apps/details?id=lat.elbarrio.app';
 const NOTICE_ENTRY_ID_PATTERN = /^[a-f0-9]{24}$/i;
+const NOTICE_BETA_ID = '11111111-1111-1111-1111-111111111111';
 const NOTICE_UUID_PATTERN = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 let noticesTail = Promise.resolve();
 
@@ -455,25 +456,36 @@ async function launchStateForIds(ids) {
     if (!Array.isArray(rows)) throw new Error('Respuesta territorial inesperada.');
     for (const item of rows) {
       if (!group.includes(item?.neighborhoodId)) continue;
+      // El Barrio C-4 es la única comunidad beta con is_active=true
+      // cuya invitación manual se permite sin activar el lanzamiento general.
+      // Jamás se permite la excepción a UV oficiales en draft.
+      const betaEligible = item.neighborhoodId === NOTICE_BETA_ID &&
+        item.noticeMode === 'beta' && item.isActive === true &&
+        ['draft', 'pilot'].includes(item.launchStatus) && item.eligible === true;
+      const launchEligible = item.launchStatus === 'active' &&
+        item.isActive === true && item.eligible === true;
       states.set(item.neighborhoodId, {
         uvCode: sanitizeText(item.uvCode, 80),
         uvName: sanitizeText(item.uvName, 120),
         comuna: sanitizeText(item.comuna, 120),
         launchStatus: sanitizeText(item.launchStatus, 30),
-        // Las dos condiciones deben cumplirse simultáneamente.
-        eligible: item.launchStatus === 'active' && item.isActive === true && item.eligible === true,
+        noticeMode: betaEligible ? 'beta' : 'launch',
+        eligible: launchEligible || betaEligible,
       });
     }
   }
   return states;
 }
 
-function noticeMessage(entry) {
+function noticeMessage(entry, noticeMode = 'launch') {
   const firstName = sanitizeText(entry.nombre, 160).split(/\s+/)[0].slice(0, 60) || 'vecino';
   const comuna = sanitizeText(entry.comuna, 120);
   const where = comuna ? ' de ' + comuna : '';
+  const headline = noticeMode === 'beta'
+    ? '¡El Barrio ya está disponible para tu sector' + where + ' como comunidad beta!'
+    : '¡El Barrio ya está activo en tu sector' + where + '!';
   return 'Hola ' + firstName + ', ¡tenemos una buena noticia!\n\n'
-    + '¡El Barrio ya está activo en tu sector' + where + '!\n\n'
+    + headline + '\n\n'
     + 'Ya puedes descargar la app para conectar con tus vecinos y descubrir comercios, servicios y novedades de tu barrio.\n\n'
     + 'Descárgala directamente desde tu teléfono:\n'
     + 'iPhone · App Store: ' + NOTICE_APP_STORE + '\n'
@@ -501,6 +513,7 @@ function publicNoticeRow(entry, uv, history) {
     neighborhoodId: mapped ? entry.neighborhoodId : null,
     launchStatus: !mapped ? 'sin_uv' : (uv?.launchStatus || 'sin_estado'),
     eligible,
+    noticeMode: uv?.noticeMode || null,
     status: sent ? 'sent' : history?.status === 'prepared' ? 'prepared' : 'pending',
     preparedAt: history?.preparedAt || null,
     sentAt: history?.sentAt || null,
@@ -557,7 +570,7 @@ app.post('/api/launch-notices/:id/prepare', requireAdmin, requireAdminSameOrigin
       if (existing.status === 'sent') return { alreadySent: true };
       const now = new Date().toISOString();
       audit[entry.id] = {
-        neighborhoodId: entry.neighborhoodId, status: 'prepared',
+        neighborhoodId: entry.neighborhoodId, noticeMode: state.noticeMode, status: 'prepared',
         preparedAt: existing.preparedAt || now, lastPreparedAt: now,
         attempts: Number(existing.attempts || 0) + 1, preparedBy: currentAdminUsername(req),
       };
@@ -570,7 +583,7 @@ app.post('/api/launch-notices/:id/prepare', requireAdmin, requireAdminSameOrigin
       status: 'prepared',
       preparedAt: result.preparedAt,
       // Abrir este enlace no confirma que el usuario recibió el mensaje.
-      whatsappUrl: 'https://wa.me/' + phone + '?text=' + encodeURIComponent(noticeMessage(entry)),
+      whatsappUrl: 'https://wa.me/' + phone + '?text=' + encodeURIComponent(noticeMessage(entry, state.noticeMode)),
     });
   } catch (error) {
     console.error('[launch-notices] Error preparando:', error?.name || 'Error');
