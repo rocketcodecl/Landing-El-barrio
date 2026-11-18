@@ -222,6 +222,53 @@ if (!SUPABASE_PROJECT_URL?.startsWith('https://') ||
   throw new Error('Configuración de réplica Contabo -> Supabase incompleta');
 }
 const MIRROR_RPC_URL = SUPABASE_PROJECT_URL + '/rest/v1/rpc/mirror_landing_registration_contabo';
+const RESOLVE_UV_RPC_URL = SUPABASE_PROJECT_URL + '/rest/v1/rpc/resolve_landing_uv_contabo';
+
+// Las coordenadas recibidas se usan solo para hallar la UV: no se guardan en waitlist.json.
+function normalizeCommune(value) {
+  return sanitizeText(value, 120).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase().replace(/\s+/g, ' ').replace(/^SANTIAGO CENTRO$/, 'SANTIAGO');
+}
+function validMapPoint(value) {
+  const lat = Number(value?.lat);
+  const lng = Number(value?.lng);
+  return value && Number.isFinite(lat) && Number.isFinite(lng) &&
+    lat >= -56 && lat <= -17 && lng >= -76 && lng <= -66
+    ? { lat, lng } : null;
+}
+async function resolveLandingUv(point, comuna) {
+  const response = await fetch(RESOLVE_UV_RPC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: SUPABASE_PUBLIC_KEY },
+    body: JSON.stringify({ p_token: CONTABO_BRIDGE_TOKEN, p_lat: point.lat, p_lng: point.lng,
+      p_comuna: normalizeCommune(comuna) }),
+    signal: AbortSignal.timeout(9000),
+  });
+  if (!response.ok) throw new Error('UV lookup RPC HTTP ' + response.status);
+  const value = await response.json();
+  return value?.neighborhoodId && /^[a-f0-9-]{36}$/i.test(value.neighborhoodId)
+    ? { neighborhoodId: value.neighborhoodId, uvCode: sanitizeText(value.uvCode, 80) }
+    : null;
+}
+// Control de abuso sobre el endpoint público (no registra latitud/longitud ni IP en disco).
+const uvLookupAttempts = new Map();
+app.post('/api/territory/resolve', async (req, res) => {
+  const point = validMapPoint(req.body);
+  const comuna = sanitizeText(req.body?.comuna, 120);
+  if (!point || !comuna) return res.status(400).json({ error: 'Selecciona un punto y una comuna válidos.' });
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  const recent = (uvLookupAttempts.get(ip) || []).filter(t => now - t < 10 * 60 * 1000);
+  if (recent.length >= 20) return res.status(429).json({ error: 'Demasiadas consultas. Intenta más tarde.' });
+  if (uvLookupAttempts.size > 5000) uvLookupAttempts.clear();
+  uvLookupAttempts.set(ip, [...recent, now]);
+  try {
+    const uv = await resolveLandingUv(point, comuna);
+    res.json(uv ? { found: true, ...uv } : { found: false });
+  } catch {
+    res.status(503).json({ error: 'La identificación del sector no está disponible temporalmente.' });
+  }
+});
 
 // Serializar todas las escrituras al archivo JSON para evitar inscripciones perdidas.
 let waitlistTail = Promise.resolve();
@@ -249,6 +296,8 @@ async function mirrorRegistration(entry) {
         comuna: entry.comuna,
         nombreNegocio: entry.nombreNegocio,
         rubro: entry.rubro,
+        neighborhoodId: entry.neighborhoodId || null,
+        uvCode: entry.uvCode || null,
       },
     }),
     signal: AbortSignal.timeout(9000),
@@ -304,6 +353,18 @@ app.post('/api/waitlist', async (req, res) => {
   if (participantType === 'comercio' && (!nombreNegocio || !rubro)) return res.status(400).json({ error: 'Nombre y rubro del comercio son requeridos' });
   if (participantType === 'servicio' && !rubro) return res.status(400).json({ error: 'El servicio u oficio es requerido' });
 
+  let uv = null;
+  if (req.body?.sector != null) {
+    const point = validMapPoint(req.body.sector);
+    if (!point) return res.status(400).json({ error: 'El punto del mapa es inválido.' });
+    try {
+      uv = await resolveLandingUv(point, comuna);
+    } catch {
+      return res.status(503).json({ error: 'No pudimos confirmar tu sector. Intenta otra vez o continúa solo con tu comuna.' });
+    }
+    if (!uv) return res.status(422).json({ error: 'El punto no pertenece a una UV reconocida de esta comuna. Elige otro punto o continúa solo con tu comuna.' });
+  }
+
   const result = await queueWaitlistWrite(async () => {
     const entries = await readJson('waitlist.json', []);
     if (entries.some((entry) => String(entry.correo).toLowerCase() === correo)) {
@@ -318,6 +379,8 @@ app.post('/api/waitlist', async (req, res) => {
       comuna,
       nombreNegocio: nombreNegocio || null,
       rubro: rubro || null,
+      neighborhoodId: uv?.neighborhoodId || null,
+      uvCode: uv?.uvCode || null,
       referralCode: referralCode(entries),
       createdAt: new Date().toISOString(),
       mirrorStatus: 'pending',
@@ -363,8 +426,8 @@ app.delete('/api/waitlist/:id', requireAdmin, async (req, res) => {
 app.get('/api/waitlist.csv', requireAdmin, async (_req, res) => {
   const entries = await readJson('waitlist.json', []);
   const escape = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
-  const rows = entries.map((entry) => [entry.id, entry.nombre, entry.correo, entry.whatsapp, entry.comuna, entry.participantType, entry.nombreNegocio, entry.rubro, entry.createdAt].map(escape).join(','));
-  res.type('text/csv').attachment(`elbarrio-registros-${new Date().toISOString().slice(0, 10)}.csv`).send(['ID,Nombre,Correo,WhatsApp,Comuna,Tipo,Negocio,Rubro,Fecha', ...rows].join('\n'));
+  const rows = entries.map((entry) => [entry.id, entry.nombre, entry.correo, entry.whatsapp, entry.comuna, entry.participantType, entry.nombreNegocio, entry.rubro, entry.createdAt, entry.uvCode, entry.neighborhoodId].map(escape).join(','));
+  res.type('text/csv').attachment(`elbarrio-registros-${new Date().toISOString().slice(0, 10)}.csv`).send(['ID,Nombre,Correo,WhatsApp,Comuna,Tipo,Negocio,Rubro,Fecha,UV,ID_Territorio', ...rows].join('\n'));
 });
 
 app.post('/api/analytics/visit', async (req, res) => {
